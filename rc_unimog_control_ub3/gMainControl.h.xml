@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Finstructable version="1703">
+  <edge src="Remote Interface/Sensor Output/Stereo Point Cloud 0" dest="ObstacleDetector/Input/Input Point Cloud"/>
+</Finstructable>
