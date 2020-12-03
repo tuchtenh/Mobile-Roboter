@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<root>
-<node name="zed2">
-  <value name="zed mount angle">-33.3°</value>
-  <value name="zed mount height">0.64</value>
-  <value name="zed raster width">5</value>
-  <value name="filter ground plane">true</value>
-</node>
-</root>
