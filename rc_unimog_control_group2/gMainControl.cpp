@@ -27,7 +27,7 @@
  *
  */
 //----------------------------------------------------------------------
-#include "projects/rc_unimog_control_group2/gMainControl.h"
+#include "projects/finroc_projects_robprak2020_2/rc_unimog_control_group2/gMainControl.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")

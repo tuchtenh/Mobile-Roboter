@@ -48,7 +48,7 @@
 //----------------------------------------------------------------------
 #include "projects/rc_unimog/gRemoteInterface.h"
 #include "projects/rc_unimog/hardware/gHardwareAbstraction.h"
-#include "projects/rc_unimog_control_group2/gMainControl.h"
+#include "projects/finroc_projects_robprak2020_2/rc_unimog_control_group2/gMainControl.h"
 
 #ifdef _LIB_FINROC_LIBRARIES_UNREAL_PRESENT_
 #include "projects/rc_unimog/unreal/gHardwareAbstraction.h"
