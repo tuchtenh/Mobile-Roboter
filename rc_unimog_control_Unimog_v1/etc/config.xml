@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<targets>
+<root>
+<node name="zed">
+  <value name="zed mount angle">-3.7°</value>
+  <value name="zed mount height">0.28</value>
+  <value name="zed raster width">12</value>
+  <value name="filter ground plane">true</value>
+</node>
+</root>
+	<program name="finroc_unimog">
+	    <sources>
+	      pUnimogControl.cpp
+	    </sources>
+	  </program>
+</targets>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://finroc.org/xml/1.0/make.dtd">
+<targets>
+
+  <finroclibrary>
+    <sources>
+      gMainControl.cpp
+      mEightDrive.cpp
+      mObstacleDetctor.cpp
+      mImageHandler.cpp
+    </sources>
+  </finroclibrary>
+  
+	<finrocprogram name="rc_unimog_control_Unimog_v1">
+	<sources>
+  		pUnimogControl.cpp
+  	</sources>
+  </finrocprogram>
+
+</targets>
