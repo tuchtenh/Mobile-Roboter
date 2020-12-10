@@ -6,6 +6,7 @@
     <sources>
       gMainControl.cpp
       mEasyDrive.cpp
+      mZEDDetection.cpp
     </sources>
   </finroclibrary>
   

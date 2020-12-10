@@ -55,7 +55,7 @@
 //----------------------------------------------------------------------
 namespace finroc
 {
-namespace rc_unimog_control_ub5
+namespace finroc_projects_robprak2020_2
 {
 
 //----------------------------------------------------------------------
@@ -77,6 +77,8 @@ class mZEDDetection : public structure::tModule
 //----------------------------------------------------------------------
 public:
 
+	//enable our instructions
+	tInput<bool> enable;
   tInput<std::vector<rrlib::coviroa::tImage>> camera_in;
   tOutput<rrlib::coviroa::tImage> camera_out;
   tOutput<double> distance_to_left_out;

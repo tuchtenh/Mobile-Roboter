@@ -45,6 +45,7 @@
 // Internal includes with ""
 //----------------------------------------------------------------------
 #include "projects/finroc_projects_robprak2020_2/mEasyDrive.h"
+#include "projects/finroc_projects_robprak2020_2/mZEDDetection.h"
 //----------------------------------------------------------------------
 // Debugging
 //----------------------------------------------------------------------
