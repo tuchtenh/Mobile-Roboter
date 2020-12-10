@@ -19,30 +19,33 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    projects/finroc_projects_robprak2020_2/mEasyDrive.h
+/*!\file    projects/rc_unimog_control_ub5/mZEDDetection.h
  *
- * \author  Aaron Hackenberg
+ * \author  Lukas Tuchtenhagen
  *
  * \date    2020-12-03
  *
- * \brief Contains mEasyDrive
+ * \brief Contains mZEDDetection
  *
- * \b mEasyDrive
+ * \b mZEDDetection
  *
- * This module implements the most basic driving functions without obstacles.
+ * classification and detection of objects using the ZED camera
  *
  */
 //----------------------------------------------------------------------
-#ifndef __projects__finroc_projects_robprak2020_2__mEasyDrive_h__
-#define __projects__finroc_projects_robprak2020_2__mEasyDrive_h__
+#ifndef __projects__rc_unimog_control_ub5__mZEDDetection_h__
+#define __projects__rc_unimog_control_ub5__mZEDDetection_h__
 
 #include "plugins/structure/tModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include "rrlib/coviroa/tImage.h"
 #include <vector>
-#include <tuple>
+#include <opencv2/opencv.hpp>
+#include "rrlib/coviroa/opencv_utils.h"
+#include <opencv2/core/matx.hpp>
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -52,7 +55,7 @@
 //----------------------------------------------------------------------
 namespace finroc
 {
-namespace finroc_projects_robprak2020_2
+namespace rc_unimog_control_ub5
 {
 
 //----------------------------------------------------------------------
@@ -64,9 +67,9 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 //! SHORT_DESCRIPTION
 /*!
- * This module implements the most basic driving functions without obstacles.
+ * classification and detection of objects using the ZED camera
  */
-class mEasyDrive : public structure::tModule
+class mZEDDetection : public structure::tModule
 {
 
 //----------------------------------------------------------------------
@@ -74,51 +77,20 @@ class mEasyDrive : public structure::tModule
 //----------------------------------------------------------------------
 public:
 
-  //Ouput for the new velocity
-  tOutput<double> out_velocity;
-  //Ouput for the new curvature
-  tOutput<double> out_curvature;
-  //Ouput for the new light settings
-  tOutput<std::vector<bool>> out_lights;
+  tInput<std::vector<rrlib::coviroa::tImage>> camera_in;
+  tOutput<rrlib::coviroa::tImage> camera_out;
+  tOutput<double> distance_to_left_out;
+  tOutput<double> distance_to_mid_out;
+  tOutput<double> distance_to_right_out;
 
 
-  //Input for the line error
-  tInput<std::tuple<double, double, double>> line_error;
-
-
-
-  //enable our instructions
-  tInput<bool> enable;
-  //determines time for the execution of one function
-  tInput<int> time;
-  //determines to drive straight or curve
-  tInput<int> mode;
-
-  tInput<double> line_error_test;
-
-  //inputs for testing
-  tInput<int> input_time_1;
-  tInput<int> input_time_2;
-
-  tInput<double> input_curvature_1;
-  tInput<double> input_curvature_2;
-  tInput<double> input_curvature_3;
-
-  tInput<double> input_velocity_1;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  mEasyDrive(core::tFrameworkElement *parent, const std::string &name = "EasyDrive");
-  //TODO add correct parameters
-  void drive_straight();
-  void drive_curve_1();
-  void drive_curve_2();
-  void drive_intersection();
-  void correction();
-  void stop();
+  mZEDDetection(core::tFrameworkElement *parent, const std::string &name = "ZEDDetection");
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -130,38 +102,18 @@ protected:
    * The destructor of modules is declared protected to avoid accidental deletion. Deleting
    * modules is already handled by the framework.
    */
-  virtual ~mEasyDrive();
+  virtual ~mZEDDetection();
 
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
 
-  bool curve;
 
-  double velocity;
-
-  double curvature;
-
-  std::vector<bool> lights;
-
-  int lock_checker;
-
-  int unlock_value;
-
-  bool lock;
-
-  double right_boundary_1;
-  double right_boundary_2;
-  double right_boundary_3;
-  double right_boundary_4;
-  double right_boundary_5;
-
-
-  virtual void OnStaticParameterChange() override;
+  virtual std::vector<double> MidDetection();
+  virtual std::vector<double> SideDetection();
 
   virtual void OnParameterChange() override;
-
   virtual void Update() override;
 
 };

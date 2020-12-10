@@ -75,13 +75,13 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   // to set the velocity of the unimog: this->hardware->ci_velocity.ConnectTo(out_your_velocity_port);
   // etc.
 {
-	//create module
-	//new mEasyDrive(this);
-	mEasyDrive* easy_drive = new mEasyDrive(this);
+  //create module
+  //new mEasyDrive(this);
+  mEasyDrive* easy_drive = new mEasyDrive(this);
 
-	//ports
-	this->co_velocity.ConnectTo(easy_drive->out_velocity);
-	this->co_curvature.ConnectTo(easy_drive->out_curvature);
+  //ports
+  this->co_velocity.ConnectTo(easy_drive->out_velocity);
+  this->co_curvature.ConnectTo(easy_drive->out_curvature);
 
 
 }

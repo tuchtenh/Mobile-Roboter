@@ -112,84 +112,85 @@ void mEasyDrive::OnParameterChange()
 //----------------------------------------------------------------------
 void mEasyDrive::Update()
 {
-	if(enable.Get()){
+  if (enable.Get())
+  {
 
-		correction();
-		velocity=0.4;
-		this->out_velocity.Publish(velocity);
-		this->out_curvature.Publish(curvature);
-		/*
-		if (mode.Get() == 1) {
-			if (!lock) {
-				lock = true;
-				lock_checker = 0;
-				unlock_value = 245;
-			}
-			drive_straight();
-		} else if (mode.Get() == 2) {
-			if (!lock) {
-				lock = true;
-				lock_checker = 0;
-				unlock_value = time.Get();
-			}
-			drive_curve_1();
-		} else if(mode.Get() == 3) {
-			if (!lock) {
-				lock = true;
-				lock_checker = 0;
-				unlock_value = time.Get();
-			}
-			drive_curve_2();
-		} else {
-			if (!lock) {
-				lock = true;
-				lock_checker = 0;
-				unlock_value = 1000;
-			}
-			stop();
-		}
-		*/
+    correction();
+    velocity = 0.4;
+    this->out_velocity.Publish(velocity);
+    this->out_curvature.Publish(curvature);
+    /*
+    if (mode.Get() == 1) {
+      if (!lock) {
+        lock = true;
+        lock_checker = 0;
+        unlock_value = 245;
+      }
+      drive_straight();
+    } else if (mode.Get() == 2) {
+      if (!lock) {
+        lock = true;
+        lock_checker = 0;
+        unlock_value = time.Get();
+      }
+      drive_curve_1();
+    } else if(mode.Get() == 3) {
+      if (!lock) {
+        lock = true;
+        lock_checker = 0;
+        unlock_value = time.Get();
+      }
+      drive_curve_2();
+    } else {
+      if (!lock) {
+        lock = true;
+        lock_checker = 0;
+        unlock_value = 1000;
+      }
+      stop();
+    }
+    */
 
-		//check for the lock, if lock=true, Publish the same velocity and curvature as last time.
-		/*if (lock && lock_checker < unlock_value) {
-			if(mode.Get() == 2) {
-				if (lock_checker < input_time_1.Get()) {
-					curvature = input_curvature_1.Get();
-				} else if (lock_checker < input_time_2.Get()){
-					curvature = input_curvature_2.Get();
-				} else {
-					curvature = input_curvature_3.Get();
-				}
-			}
-			lock_checker++;
-		} else {
-			lock = false;
-			lock_checker = 0;
-			//call the function fitting the current road type
-			if (mode.Get() == 1) {
-				if (!curve) {
-					curve = true;
-					drive_straight();
-				} else {
-					curve=false;
-					stop();
-				}
-			} else if (mode.Get() == 2) {
-				if (!curve) {
-					curve = true;
-					drive_curve();
-				} else {
-					curve=false;
-					stop();
-				}
-			} else {
-				stop();
-			}
-		}
-		this->out_velocity.Publish(velocity);
-		this->out_curvature.Publish(curvature);*/
-	}
-	//TODO
+    //check for the lock, if lock=true, Publish the same velocity and curvature as last time.
+    /*if (lock && lock_checker < unlock_value) {
+      if(mode.Get() == 2) {
+        if (lock_checker < input_time_1.Get()) {
+          curvature = input_curvature_1.Get();
+        } else if (lock_checker < input_time_2.Get()){
+          curvature = input_curvature_2.Get();
+        } else {
+          curvature = input_curvature_3.Get();
+        }
+      }
+      lock_checker++;
+    } else {
+      lock = false;
+      lock_checker = 0;
+      //call the function fitting the current road type
+      if (mode.Get() == 1) {
+        if (!curve) {
+          curve = true;
+          drive_straight();
+        } else {
+          curve=false;
+          stop();
+        }
+      } else if (mode.Get() == 2) {
+        if (!curve) {
+          curve = true;
+          drive_curve();
+        } else {
+          curve=false;
+          stop();
+        }
+      } else {
+        stop();
+      }
+    }
+    this->out_velocity.Publish(velocity);
+    this->out_curvature.Publish(curvature);*/
+  }
+  //TODO
   /*if (this->InputChanged())
   {
     At least one of your input ports has changed. Do something useful with its data.
@@ -206,18 +207,22 @@ void mEasyDrive::Update()
 // Publishes the velocity and curvature necessary to drive
 // in a straight line within a lane
 //----------------------------------------------------------------------
-void mEasyDrive::drive_straight(){
-	velocity = 1;
-	curvature = 0;
-	if (lock_checker < unlock_value) {
-		lock_checker++;
-	} else {
-		lock = false;
-	}
-	this->out_velocity.Publish(velocity);
-	this->out_curvature.Publish(curvature);
-	//this->out_velocity.Publish(1);
-	//this->out_velocity.Publish(0);
+void mEasyDrive::drive_straight()
+{
+  velocity = 1;
+  curvature = 0;
+  if (lock_checker < unlock_value)
+  {
+    lock_checker++;
+  }
+  else
+  {
+    lock = false;
+  }
+  this->out_velocity.Publish(velocity);
+  this->out_curvature.Publish(curvature);
+  //this->out_velocity.Publish(1);
+  //this->out_velocity.Publish(0);
 
 }
 //----------------------------------------------------------------------
@@ -225,103 +230,148 @@ void mEasyDrive::drive_straight(){
 // Publishes the velocity and curvature necessary to drive
 // in a curve within a lane
 //----------------------------------------------------------------------
-void mEasyDrive::drive_curve_1(){
-	velocity = input_velocity_1.Get();
-	if (lock_checker < input_time_1.Get()) {
-		curvature = input_curvature_1.Get();
-	} else if (lock_checker < input_time_2.Get()){
-		curvature = input_curvature_2.Get();
-	} else {
-		curvature = input_curvature_3.Get();
-	}
-	if (lock_checker < unlock_value) {
-		lock_checker++;
-	} else {
-		lock = false;
-	}
-	this->out_velocity.Publish(velocity);
-	this->out_curvature.Publish(curvature);
-	//this->out_velocity.Publish(1);
-	//this->out_curvature.Publish(1.3);
+void mEasyDrive::drive_curve_1()
+{
+  velocity = input_velocity_1.Get();
+  if (lock_checker < input_time_1.Get())
+  {
+    curvature = input_curvature_1.Get();
+  }
+  else if (lock_checker < input_time_2.Get())
+  {
+    curvature = input_curvature_2.Get();
+  }
+  else
+  {
+    curvature = input_curvature_3.Get();
+  }
+  if (lock_checker < unlock_value)
+  {
+    lock_checker++;
+  }
+  else
+  {
+    lock = false;
+  }
+  this->out_velocity.Publish(velocity);
+  this->out_curvature.Publish(curvature);
+  //this->out_velocity.Publish(1);
+  //this->out_curvature.Publish(1.3);
 }
 //----------------------------------------------------------------------
 // mEasyDrive drive_curve_2
 // Publishes the inverse velocity and curvature necessary to drive
 // in a curve within a lane
 //----------------------------------------------------------------------
-void mEasyDrive::drive_curve_2(){
-	velocity = input_velocity_1.Get();
-	if (lock_checker < time.Get()-input_time_2.Get()) {
-		curvature = input_curvature_3.Get();
-	} else if (lock_checker < time.Get()-input_time_1.Get()){
-		curvature = input_curvature_2.Get();
-	} else {
-		curvature = input_curvature_1.Get();
-	}
-	if (lock_checker < unlock_value) {
-		lock_checker++;
-	} else {
-		lock = false;
-	}
-	this->out_velocity.Publish(velocity);
-	this->out_curvature.Publish(curvature);
-	//this->out_velocity.Publish(1);
-	//this->out_curvature.Publish(1.3);
+void mEasyDrive::drive_curve_2()
+{
+  velocity = input_velocity_1.Get();
+  if (lock_checker < time.Get() - input_time_2.Get())
+  {
+    curvature = input_curvature_3.Get();
+  }
+  else if (lock_checker < time.Get() - input_time_1.Get())
+  {
+    curvature = input_curvature_2.Get();
+  }
+  else
+  {
+    curvature = input_curvature_1.Get();
+  }
+  if (lock_checker < unlock_value)
+  {
+    lock_checker++;
+  }
+  else
+  {
+    lock = false;
+  }
+  this->out_velocity.Publish(velocity);
+  this->out_curvature.Publish(curvature);
+  //this->out_velocity.Publish(1);
+  //this->out_curvature.Publish(1.3);
 }
 //----------------------------------------------------------------------
 // mEasyDrive drive_intersection
 // Publishes the velocity and curvature necessary to drive
 // through an intersection
 //----------------------------------------------------------------------
-void mEasyDrive::drive_intersection() {
-	//TODO
+void mEasyDrive::drive_intersection()
+{
+  //TODO
 }
 //----------------------------------------------------------------------
 // mEasyDrive correction
 // Publishes the velocity and curvature necessary to drive
 // back onto the street when an error happen and the line got crossed
 //----------------------------------------------------------------------
-void mEasyDrive::correction(){
-	//double x = std::get<2>(line_error.Get());
-	double x = line_error_test.Get();
-	if (x > right_boundary_1) {
-		curvature = 3.0;
-	} else if (x > right_boundary_2) {
-		curvature = 2.5;
-	} else if (x > right_boundary_3) {
-		curvature = 2.0;
-	} else if (x > right_boundary_4) {
-		curvature = 1.5;
-	} else if (x > right_boundary_5) {
-		curvature = 1.0;
-	} else if (x < -right_boundary_5){
-		curvature = -1.0;
-	} else if (x < -right_boundary_4) {
-		curvature = -1.5;
-	} else if (x < -right_boundary_3) {
-		curvature = -2.0;
-	} else if (x < -right_boundary_2) {
-		curvature = -2.5;
-	} else if (x < -right_boundary_1) {
-		curvature = -3.0;
-	} else {
-		curvature = 0;
-	}
+void mEasyDrive::correction()
+{
+  //double x = std::get<2>(line_error.Get());
+  double x = line_error_test.Get();
+  if (x > right_boundary_1)
+  {
+    curvature = 3.0;
+  }
+  else if (x > right_boundary_2)
+  {
+    curvature = 2.5;
+  }
+  else if (x > right_boundary_3)
+  {
+    curvature = 2.0;
+  }
+  else if (x > right_boundary_4)
+  {
+    curvature = 1.5;
+  }
+  else if (x > right_boundary_5)
+  {
+    curvature = 1.0;
+  }
+  else if (x < -right_boundary_5)
+  {
+    curvature = -1.0;
+  }
+  else if (x < -right_boundary_4)
+  {
+    curvature = -1.5;
+  }
+  else if (x < -right_boundary_3)
+  {
+    curvature = -2.0;
+  }
+  else if (x < -right_boundary_2)
+  {
+    curvature = -2.5;
+  }
+  else if (x < -right_boundary_1)
+  {
+    curvature = -3.0;
+  }
+  else
+  {
+    curvature = 0;
+  }
 }
 //----------------------------------------------------------------------
 // mEasyDrive stop
 // Publishes the velocity and curvature necessary to stop
 //----------------------------------------------------------------------
-void mEasyDrive::stop() {
-	velocity=0;
-	curvature=0;
-	if (lock_checker < unlock_value) {
-		lock_checker++;
-	} else {
-		lock = false;
-	}
-	this->out_velocity.Publish(velocity);
-	this->out_curvature.Publish(curvature);
+void mEasyDrive::stop()
+{
+  velocity = 0;
+  curvature = 0;
+  if (lock_checker < unlock_value)
+  {
+    lock_checker++;
+  }
+  else
+  {
+    lock = false;
+  }
+  this->out_velocity.Publish(velocity);
+  this->out_curvature.Publish(curvature);
 }
 //----------------------------------------------------------------------
 // End of namespace declaration
