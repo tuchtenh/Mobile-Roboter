@@ -28,7 +28,7 @@
  */
 //----------------------------------------------------------------------
 #include "projects/finroc_projects_robprak2020_2/rc_unimog_control_group2/gMainControl.h"
-
+#include "projects/finroc_projects_robprak2020_2/rc_unimog_control_group2/mZEDDetection.h"
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
@@ -74,7 +74,9 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   // this->hardware->so_velocity.ConnectTo(...)
   // to set the velocity of the unimog: this->hardware->ci_velocity.ConnectTo(out_your_velocity_port);
   // etc.
-{}
+{
+  new mZEDDetection(this, "ZEDDetection");
+}
 
 //----------------------------------------------------------------------
 // End of namespace declaration

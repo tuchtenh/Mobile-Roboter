@@ -5,6 +5,7 @@
   <finroclibrary>
     <sources>
       gMainControl.cpp
+      mZEDDetection.cpp
     </sources>
   </finroclibrary>
   
