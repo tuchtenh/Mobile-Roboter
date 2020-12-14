@@ -112,8 +112,8 @@ protected:
 private:
 
 
-  virtual std::vector<double> MidDetection();
-  virtual std::vector<double> SideDetection();
+  //virtual std::vector<double> MidDetection();
+  //virtual std::vector<double> SideDetection();
 
   virtual void OnParameterChange() override;
   virtual void Update() override;
