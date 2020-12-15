@@ -78,7 +78,7 @@ class mZEDDetection : public structure::tModule
 public:
 
 	//enable our instructions
-	tInput<bool> enable;
+	//tInput<bool> enable;
   tInput<std::vector<rrlib::coviroa::tImage>> camera_in;
   tOutput<rrlib::coviroa::tImage> camera_out;
   tOutput<double> distance_to_left_out;
@@ -112,8 +112,8 @@ protected:
 private:
 
 
-  virtual std::vector<double> MidDetection();
-  virtual std::vector<double> SideDetection();
+  //virtual std::vector<double> MidDetection();
+  //virtual std::vector<double> SideDetection();
 
   virtual void OnParameterChange() override;
   virtual void Update() override;

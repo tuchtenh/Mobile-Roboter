@@ -83,7 +83,7 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
 
   //ports
   //this->hardware->ci_velocity.ConnectTo(easy_drive->out_velocity);
-  zed_detection->distance_to_mid_out.ConnectTo(easy_drive->line_error_test);
+  zed_detection->distance_to_left_out.ConnectTo(easy_drive->line_error_test);
   //this->hardware->so_cam_images.ConnectTo(zed_detection->camera_in);
   this->co_velocity.ConnectTo(easy_drive->out_velocity);
   this->co_curvature.ConnectTo(easy_drive->out_curvature);
