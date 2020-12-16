@@ -274,7 +274,7 @@ std::vector<double> mZEDDetection::SideDetection(){
 
          cv::imwrite("bildHOUGHLINESsides.png", img);
 
-         std::cout << lines.size() << std::endl;
+         //std::cout << lines.size() << std::endl;
          // start and end of the lines stored as points
          for (auto i : left_lines) {
               ini = cv::Point(i[0], i[1]);
@@ -451,7 +451,7 @@ void mZEDDetection::Update()
 
             cv::imwrite("bildHOUGHLINES.png", img);
 
-            std::cout << lines.size() << std::endl;
+            //std::cout << lines.size() << std::endl;
             // start and end of the lines stored as points
             for (auto i : left_lines) {
                  ini = cv::Point(i[0], i[1]);
@@ -501,14 +501,14 @@ void mZEDDetection::Update()
 
              double right_ini_x = ((ini_y - right_b.y) / right_m) + right_b.x;
              double right_fini_x = ((fini_y - right_b.y) / right_m) + right_b.x;
-             std::cout << right_ini_x << " ";
-             std::cout << right_fini_x << std::endl;
+             //std::cout << right_ini_x << " ";
+             //std::cout << right_fini_x << std::endl;
 
              double mid_ini_x = ((ini_y - mid_b.y) / mid_m) + mid_b.x;
              double mid_fini_x = ((fini_y - mid_b.y) / mid_m) + mid_b.x;
 
-             std::cout << mid_ini_x << " " ;
-             std::cout << mid_fini_x << std::endl;
+             //std::cout << mid_ini_x << " " ;
+             //std::cout << mid_fini_x << std::endl;
 
              double left_ini_x = ((ini_y - left_b.y) / left_m) + left_b.x;
              double left_fini_x = ((fini_y - left_b.y) / left_m) + left_b.x;
@@ -692,8 +692,8 @@ void mZEDDetection::Update()
 
             cv::imwrite("bildHOUGHLINES.png", img);
 
-            std::cout << lines.size() << " mid lines" << std::endl;
-            std::cout << linesred.size() << " side lines" << std::endl;
+            //std::cout << lines.size() << " mid lines" << std::endl;
+            //std::cout << linesred.size() << " side lines" << std::endl;
             // start and end of the lines stored as points
             for (auto i : left_lines) {
                  ini = cv::Point(i[0], i[1]);
@@ -711,11 +711,11 @@ void mZEDDetection::Update()
                  left_b = cv::Point(left_line[2], left_line[3]);
                }
             // start and end of the lines stored as points
-           std::cout<<mid_lines.size()<<std::endl;
+           ////std::cout<<mid_lines.size()<<std::endl;
            for (auto i : mid_lines) {
                 ini = cv::Point(i[0], i[1]);
                 fini = cv::Point(i[2], i[3]);
-                std::cout<< "point "<<i[0]<<" "<<i[1]<<" "<<i[2]<<" "<<i[3]<<std::endl;
+                //std::cout<< "point "<<i[0]<<" "<<i[1]<<" "<<i[2]<<" "<<i[3]<<std::endl;
                 mid_pts.push_back(ini);
                 mid_pts.push_back(fini);
               }
@@ -748,16 +748,16 @@ void mZEDDetection::Update()
              // calculate start and finish points for right, mid and left lines
              double right_ini_x = ((ini_y - right_b.y) / right_m) + right_b.x;
              double right_fini_x = ((fini_y - right_b.y) / right_m) + right_b.x;
-             std::cout << right_ini_x << " ";
-             std::cout << right_fini_x << " ";
-             std::cout << right_m << std::endl;
+             //std::cout << right_ini_x << " ";
+             //std::cout << right_fini_x << " ";
+             //std::cout << right_m << std::endl;
 
              double mid_ini_x = ((ini_y - mid_b.y) / mid_m) + mid_b.x;
              double mid_fini_x = ((fini_y - mid_b.y) / mid_m) + mid_b.x;
 
-             std::cout << mid_ini_x << " " ;
-             std::cout << mid_fini_x << " " ;
-             std::cout << mid_m << std::endl;
+             //std::cout << mid_ini_x << " " ;
+             //std::cout << mid_fini_x << " " ;
+             //std::cout << mid_m << std::endl;
 
              double left_ini_x = ((ini_y - left_b.y) / left_m) + left_b.x;
              double left_fini_x = ((fini_y - left_b.y) / left_m) + left_b.x;

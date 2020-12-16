@@ -110,6 +110,7 @@ void mEasyDrive::Update() {
 		if (std::isinf(line_error_test.Get())) {
 			velocity = 0;
 			curvature = 0;
+			std::cout<<"Line distance is infinite!"<<std::endl;
 		} else {
 			correction();
 			velocity = 0.4;
@@ -281,11 +282,12 @@ void mEasyDrive::drive_intersection() {
 //----------------------------------------------------------------------
 void mEasyDrive::correction() {
 	//double x = std::get<2>(line_error.Get());
+	//double function = c * (x*x*x) with x = (line_error + offset) /
 	//for the middle line choose c = -0,1 and d = 19 and offset = 60
 	//for the left line choose c = 0.1 and d = 19 and offset = 270 (not finished yet!!!!!)
 	//for the right line choose c = ? and d = ? and offset = ?
 	//shouldn it all be the same except for the offset? The change should have the same size right?
-	int offset = time.Get();
+	/*int offset = time.Get();
 	double d = 1;
 	if (input_curvature_2.Get() != 0) {
 		d = input_curvature_2.Get();
@@ -294,6 +296,17 @@ void mEasyDrive::correction() {
 	double c = input_curvature_1.Get();
 	double function = c * (x * x * x);
 	std::cout << "result: " << function << std::endl;
+	curvature = function;*/
+	int offset = 70;
+	double x = line_error_test.Get() + offset;
+	std::cout<<x<<std::endl;
+	double a = 0.059;
+	double function = 0;
+	if (x >= 10) {
+		function = -3*(1-exp(a * -x));
+	} else if (x <= -10){
+		function = 3*(1-exp(a*x));
+	}
 	curvature = function;
 	/*if (x > right_boundary_1)
 	 {
