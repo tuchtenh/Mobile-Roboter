@@ -58,6 +58,36 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+class LineDetMachine
+{
+
+private:
+
+  enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
+  State state;
+  double midValue = 0;
+  double rightValue = 0;
+  double leftValue = 0;
+
+  double velocity = 0.4;
+  double offset = 0;
+
+  const double midValue_min = -100, midValue_max = 0;
+  const double rightValue_min = 0, rightValue_max = 300;
+  const double leftValue_min = -500, leftValue_max = -100;
+
+  double x;
+
+
+
+public:
+  void setLineValue(double m, double r, double l);
+  void chooseLine();
+  double publishOffset();
+  double publishPixel();
+
+};
+
 
 //----------------------------------------------------------------------
 // Class declaration
@@ -100,9 +130,9 @@ public:
   tInput<int> input_time_1;
   tInput<int> input_time_2;
 
-  tInput<double> input_curvature_1;
-  tInput<double> input_curvature_2;
-  tInput<double> input_curvature_3;
+  tInput<double> input_curvature_left;
+  tInput<double> input_curvature_middle;
+  tInput<double> input_curvature_right;
 
   tInput<double> input_velocity_1;
 
@@ -117,8 +147,14 @@ public:
   void drive_curve_1();
   void drive_curve_2();
   void drive_intersection();
-  void correction();
+
+  void ruleBaseAlgrithm();
+  void linearAlgrithm();
+  void powerAlgrithm();
+  void expAlgrithm();
   void stop();
+
+  void expAlgrithm(int offset, double pixelValue);
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -164,7 +200,19 @@ private:
 
   virtual void Update() override;
 
+
+  LineDetMachine lineDet;
+
+
 };
+
+
+
+
+
+
+
+
 
 //----------------------------------------------------------------------
 // End of namespace declaration
