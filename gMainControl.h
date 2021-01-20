@@ -78,10 +78,44 @@ class gMainControl : public structure::tSenseControlGroup
 //----------------------------------------------------------------------
 public:
   rc_unimog::shared::gHardwareAbstractionBase * hardware;
+
   tControllerOutput<rrlib::si_units::tVelocity<double>> co_velocity;
+  tControllerOutput<rrlib::math::tAngleRad> co_slip_angle;
   tControllerOutput<rrlib::si_units::tCurvature<double>> co_curvature;
   tControllerOutput<bool> co_enable;
-//----------------------------------------------------------------------
+  tControllerOutput<bool> co_warn_buzzer;
+  tControllerOutput<bool> co_request_emergency_stop;
+  tControllerOutput<data_ports::tEvent> co_request_emergency_stop_event;
+  std::vector<tControllerInput<bool>> co_lights;
+
+  tSensorInput<double> si_joystick_velocity_normalized;
+  tSensorInput<rrlib::si_units::tVelocity<double>> si_joystick_velocity;
+  tSensorInput<double> si_joystick_curvature_normalized;
+  tSensorInput<rrlib::si_units::tCurvature<double>> si_joystick_curvature;
+  tSensorInput<rrlib::math::tAngleRad> si_joystick_slip_angle;
+
+  tSensorInput<data_ports::tEvent> si_init;
+  tSensorInput<bool> si_joystick_initialized;
+
+  tSensorInput<rrlib::si_units::tVelocity<double>> si_velocity;
+  tSensorInput<rrlib::math::tAngleRad> si_slip_angle;
+  tSensorInput<rrlib::si_units::tCurvature<double>> si_curvature;
+
+  tSensorInput<rrlib::si_units::tVelocity<double>> si_wheel_velocity_rear_right;
+  tSensorInput<rrlib::si_units::tVelocity<double>> si_wheel_velocity_rear_left;
+  tSensorInput<rrlib::si_units::tAngularVelocity<double>> si_wheel_angular_velocity_rear_right;
+  tSensorInput<rrlib::si_units::tAngularVelocity<double>> si_wheel_angular_velocity_rear_left;
+
+  tSensorInput<rrlib::si_units::tLength<double>> si_us_front;
+  tSensorInput<rrlib::si_units::tLength<double>> si_us_rear;
+  tSensorInput<rrlib::si_units::tLength<double>> si_sharp_right_front;
+  tSensorInput<rrlib::si_units::tLength<double>> si_sharp_right_rear;
+  tSensorInput<rrlib::si_units::tLength<double>> si_sharp_left_front;
+  tSensorInput<rrlib::si_units::tLength<double>> si_sharp_left_rear;
+
+  tSensorInput<rrlib::coviroa::tImages> si_stereo_cam_image_0;
+  tSensorInput<rrlib::distance_data::tDistanceData> si_stereo_point_cloud_0;
+// ---------------------------------------------------------------------
 // Public methods and typedefs (no fields/variables)
 //----------------------------------------------------------------------
 public:

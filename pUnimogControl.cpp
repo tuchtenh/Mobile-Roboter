@@ -128,12 +128,16 @@ void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
   {
     FINROC_LOG_PRINT(USER, "Initialize hardware connections.");
     control->hardware = new finroc::rc_unimog::gRemoteInterface(control, "Remote Interface");
+    control->hardware->GetSensorOutputs().ConnectByName(control->GetSensorInputs(), true);
+    control->hardware->GetControllerInputs().ConnectByName(control->GetControllerOutputs(), true);
   }
 #ifdef _LIB_FINROC_LIBRARIES_UNREAL_PRESENT_
   else if (unimog_mode == tUnimogControlMode::eUNREAL)
   {
     FINROC_LOG_PRINT(USER, "Initialize simulation connections.");
     control->hardware = new finroc::rc_unimog::unreal::gHardwareAbstraction(control, "Hardware Interface");
+    control->hardware->GetSensorOutputs().ConnectByName(control->GetSensorInputs(), true);
+    control->hardware->GetControllerInputs().ConnectByName(control->GetControllerOutputs(), true);
   }
 #endif
   else

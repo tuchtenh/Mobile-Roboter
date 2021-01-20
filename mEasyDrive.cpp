@@ -132,7 +132,7 @@ void mEasyDrive::Update()
       velocity = 0.4;
     }*/
 
-    if (offset == 0)
+    if (offset == 0)  //three lines detection fail
     {
       velocity = 0;
       curvature = 0;
@@ -471,7 +471,7 @@ void LineDetMachine::chooseLine()
       x = midValue;
       velocity = 0.4;
       offset = 70;
-      std::cout << "Middle Line Choose(new version)" << std::endl;
+      std::cout << "Middle Line Choose =)))" << std::endl;
     }
     else
     {
