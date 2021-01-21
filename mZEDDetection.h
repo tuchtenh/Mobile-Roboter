@@ -46,6 +46,7 @@
 #include <opencv2/opencv.hpp>
 #include "rrlib/coviroa/opencv_utils.h"
 #include <opencv2/core/matx.hpp>
+#include <queue>
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -77,14 +78,16 @@ class mZEDDetection : public structure::tModule
 //----------------------------------------------------------------------
 public:
 
-	//enable our instructions
-	//tInput<bool> enable;
+  //enable our instructions
+  //tInput<bool> enable;
   tInput<std::vector<rrlib::coviroa::tImage>> camera_in;
   tOutput<rrlib::coviroa::tImage> camera_out;
   tOutput<double> distance_to_left_out;
   tOutput<double> distance_to_mid_out;
   tOutput<double> distance_to_right_out;
-
+  tOutput<double> angle_to_left_out;
+  tOutput<double> angle_to_mid_out;
+  tOutput<double> angle_to_right_out;
 
 
 //----------------------------------------------------------------------
@@ -117,6 +120,10 @@ private:
 
   virtual void OnParameterChange() override;
   virtual void Update() override;
+
+  std::queue <double> queueRight;
+  std::queue <double> queueMid;
+  std::queue <double> queueLeft;
 
 };
 
