@@ -47,16 +47,16 @@
 #include <opencv2/opencv.hpp>
 #include "rrlib/coviroa/opencv_utils.h"
 #include <opencv2/core/matx.hpp>
+#include <queue>
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-
 //----------------------------------------------------------------------
 // Namespace declaration
 //----------------------------------------------------------------------
 namespace finroc
 {
-namespace rc_unimog_control_ub5
+namespace rc_unimog_control_group2
 {
 
 //----------------------------------------------------------------------
@@ -83,6 +83,14 @@ public:
   tOutput<double> distance_to_left_out;
   tOutput<double> distance_to_mid_out;
   tOutput<double> distance_to_right_out;
+  /*
+   * angle values of 90° men the robot parallel to the line
+   *  angles lower than 90° mean the robot is rotate to the right
+   *  angles higher than 90° mean the robot is rotate to the left
+   */
+  tOutput<double> angle_to_left_out;
+  tOutput<double> angle_to_mid_out;
+  tOutput<double> angle_to_right_out;
 
 
 
@@ -116,6 +124,10 @@ private:
 
   virtual void OnParameterChange() override;
   virtual void Update() override;
+
+  std::queue <double> queueRight;
+  std::queue <double> queueMid;
+  std::queue <double> queueLeft;
 
 };
 

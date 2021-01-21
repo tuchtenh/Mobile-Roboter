@@ -52,7 +52,7 @@
 //----------------------------------------------------------------------
 namespace finroc
 {
-namespace rc_unimog_control_ub5
+namespace rc_unimog_control_group2
 {
 
 //----------------------------------------------------------------------
@@ -501,6 +501,38 @@ void mZEDDetection::Update()
       cv::imwrite("bildFittedLines.png", img);
 
       double midpixel = img.cols / 2;
+
+      if (queueLeft.size() < 9 && left_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueLeft.push(left_ini_x - midpixel);
+      }
+      else if (left_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueLeft.push(left_ini_x - midpixel);
+        this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 100))));
+        queueLeft.pop();
+      }
+
+      if (queueMid.size() < 9 && mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueMid.push(mid_ini_x - midpixel);
+      }
+      else if (mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueMid.push(mid_ini_x - midpixel);
+        this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 100))));
+        queueMid.pop();
+      }
+      if (queueRight.size() < 9 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueRight.push(right_ini_x - midpixel);
+      }
+      else if (right_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      {
+        queueRight.push(right_ini_x - midpixel);
+        this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 100))));
+        queueRight.pop();
+      }
 
       this->distance_to_left_out.Publish((left_ini_x - midpixel));
       this->distance_to_mid_out.Publish((mid_ini_x - midpixel));
