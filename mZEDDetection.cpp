@@ -798,7 +798,7 @@ void mZEDDetection::Update()
 
       double midpixel = img.cols / 2;
 
-      if (queueLeft.size() < 9 && left_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      if (queueLeft.size() < 999 && left_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueLeft.push(left_ini_x - midpixel);
       }
@@ -809,7 +809,7 @@ void mZEDDetection::Update()
         queueLeft.pop();
       }
 
-      if (queueMid.size() < 9 && mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      if (queueMid.size() < 999 && mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueMid.push(mid_ini_x - midpixel);
       }
@@ -819,7 +819,7 @@ void mZEDDetection::Update()
         this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 100))));
         queueMid.pop();
       }
-      if (queueRight.size() < 9 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
+      if (queueRight.size() < 999 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueRight.push(right_ini_x - midpixel);
       }
@@ -836,7 +836,7 @@ void mZEDDetection::Update()
 
 
       // Make one image
-      usleep(100000);
+      //usleep(100000);
 
 
       this->camera_out.Publish(img_out);
