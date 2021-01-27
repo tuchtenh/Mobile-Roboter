@@ -129,6 +129,12 @@ private:
 
   tk::dnn::DetectionNN *detNN; 
   
+  tk::dnn::Yolo3Detection yolo;
+  
+  std::vector<cv::Mat> batch_frame;
+  
+  std::vector<cv::Mat> batch_dnn_input;
+  
   std::vector<tk::dnn::box> detected_bbox;
   
   double conf_thresh = 0.6;

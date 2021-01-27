@@ -37,6 +37,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "rrlib/coviroa/opencv_utils.h"
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -78,9 +82,7 @@ runtime_construction::tStandardCreateModuleAction<mImageDetectorTKDNN> cCREATE_A
 mImageDetectorTKDNN::mImageDetectorTKDNN(core::tFrameworkElement *parent, const std::string &name) :
   tModule(parent, name, false) // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
 {
-     //DOES NOT WORK WITHOUT THOSE 2 LINES, BUT DOES NOT COMPILE WITH THEM
-     //tk::dnn::Yolo3Detection yolo;
-     //detNN = &yolo;
+     detNN = &yolo;
      
      int n_classes = 5;
      n_batch= 1;
@@ -124,67 +126,63 @@ void mImageDetectorTKDNN::Update()
         if (in_img->size() > 0){
             
             
-            
-            const cv::Mat cam_image_img = rrlib::coviroa::AccessImageAsMat(in_img->at(0));
-
-
+            cv::Mat cam_image= rrlib::coviroa::AccessImageAsMat(in_img->at(0));
+            cv::Mat cam_image_img;
+            cvtColor(cam_image, cam_image_img, CV_BGR2RGB);
             bool stopDetect = false, give_wayDetect = false, conesDetect = false, right_of_wayDetect = false, unimogDetect  = false;
            
-                
-            
-            std::vector<cv::Mat> batch_frame;
-            std::vector<cv::Mat> batch_dnn_input;
-            
-            
-            batch_dnn_input.push_back(cam_image_img);
-            batch_frame.push_back(cam_image_img.clone());
-            
+            batch_dnn_input.clear();
+            batch_frame.clear();
+
+            batch_dnn_input.push_back(cam_image_img.clone());
+            batch_frame.push_back(cam_image_img);
             detNN->update(batch_dnn_input, n_batch);
+
             detNN->draw(batch_frame);
-            
-             ///DETECT HERE
             detected_bbox.clear();
             detected_bbox = detNN->detected;
+
             for (auto d: detected_bbox)
             {
-            
+                //std::cout<<"found something with class"<<d.cl<<"size:"<<d.w<<" x " <<d.h<<"results:"<<d.h*d.w<<std::endl;
                 switch(d.cl){
                     case 0: //stop
-                        if(d.w * d.h > 4000){
+                        if(d.w * d.h > 1200){
                             stopDetect = true;
                         }
                         break;
                     case 1: 
-                        if(d.w * d.h > 4000){
-                            give_wayDetect = true;
+                        if(d.w * d.h > 1200){
+                            right_of_wayDetect = true;
                         }
                         break;
                     case 2:
-                        if(d.w * d.h > 4000){
-                           right_of_wayDetect = true;
+                        if(d.w * d.h > 1200){
+                            give_wayDetect = true;
                             
                         }
                         break;
                     case 3:
-                        if(d.w * d.h > 4000){
+                        if(d.w * d.h > 1000){
                             conesDetect = true;
                         }
                         break;
                     case 4://unimog
-                        if(d.w * d.h > 8000){
+                        if(d.w * d.h > 5000){
                             unimogDetect = true;
                         }
                         break;
                     }
-                               
             }
-            
+            //std::cout<<"still working"<<std::endl;
+            //cv::imwrite("detection.png", batch_frame[0]);
             // prepare output image
             data_ports::tPortDataPointer<rrlib::coviroa::tImage> img_out = this->out_image.GetUnusedBuffer();
             // copy input image to output image
             rrlib::rtti::GenericOperations<rrlib::coviroa::tImage>::DeepCopy((*in_img)[0], *img_out);
             // use the tImage data acs an cv::Mat (does not copy the data)
             cv::Mat out = rrlib::coviroa::AccessImageAsMat(*img_out);
+            out = batch_frame[0];
             
             img_out.SetTimestamp(in_img.GetTimestamp());
            

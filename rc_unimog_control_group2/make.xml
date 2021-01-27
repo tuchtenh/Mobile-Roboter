@@ -2,17 +2,40 @@
 <!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://finroc.org/xml/1.0/make.dtd">
 <targets>
 
-  <finroclibrary>
+  <finroclibrary >
     <sources>
       gMainControl.cpp
       mZEDDetection.cpp
     </sources>
   </finroclibrary>
   
-	<finrocprogram name="rc_unimog_control_group2">
+	<finrocprogram name="rc_unimog_control_group2" >
 	<sources>
   		pUnimogControl.cpp
   	</sources>
   </finrocprogram>
 
 </targets>
+
+
+<!-- in order to use image detection, change it to this:
+
+  <finroclibrary libs ="tkDNN cuda">
+    <sources>
+      gMainControl.cpp
+      mZEDDetection.cpp
+      mImageDetectorTKDNN.cpp
+    </sources>
+  </finroclibrary>
+  
+	<finrocprogram name="rc_unimog_control_group2" libs ="tkDNN cuda">
+	<sources>
+  		pUnimogControl.cpp
+  	</sources>
+  </finrocprogram>
+
+</targets>
+
+
+
+-->
