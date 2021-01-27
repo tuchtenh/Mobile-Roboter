@@ -113,7 +113,7 @@ void mEasyDrive::OnParameterChange()
 //----------------------------------------------------------------------
 void mEasyDrive::Update()
 {
-
+  //std::cout <<  "AAAAA"<<std::endl;
   // choose which line to follow
   lineDet.setLineValue(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
   lineDet.chooseLine();
@@ -121,104 +121,104 @@ void mEasyDrive::Update()
   double x = lineDet.publishPixel();
 
   //follow the line
-  if (enable.Get())
+  //if (enable.Get())
+  //{
+  /*if (std::isinf(line_error_test.Get())) {
+    velocity = 0;
+    curvature = 0;
+    std::cout<<"Line distance is infinite!"<<std::endl;
+  } else {
+    expAlgrithm();
+    velocity = 0.4;
+  }*/
+
+  if (lineDet.noLineDetection == true) //three lines detection fail
   {
-    /*if (std::isinf(line_error_test.Get())) {
-      velocity = 0;
-      curvature = 0;
-      std::cout<<"Line distance is infinite!"<<std::endl;
-    } else {
-      expAlgrithm();
-      velocity = 0.4;
-    }*/
-
-    if (offset == 0)  //three lines detection fail
-    {
-      velocity = 0;
-      curvature = 0;
-      std::cout << "Line distance is infinite!" << std::endl;
-    }
-    else
-    {
-      expAlgrithm(offset, x);
-      velocity = 0.4;
-    }
-
-
-
-    this->out_velocity.Publish(velocity);
-    this->out_curvature.Publish(curvature);
-    /*
-     if (mode.Get() == 1) {
-     if (!lock) {
-     lock = true;
-     lock_checker = 0;
-     unlock_value = 245;
-     }
-     drive_straight();
-     } else if (mode.Get() == 2) {
-     if (!lock) {
-     lock = true;
-     lock_checker = 0;
-     unlock_value = time.Get();
-     }
-     drive_curve_1();
-     } else if(mode.Get() == 3) {
-     if (!lock) {
-     lock = true;
-     lock_checker = 0;
-     unlock_value = time.Get();
-     }
-     drive_curve_2();
-     } else {
-     if (!lock) {
-     lock = true;
-     lock_checker = 0;
-     unlock_value = 1000;
-     }
-     stop();
-     }
-     */
-
-    //check for the lock, if lock=true, Publish the same velocity and curvature as last time.
-    /*if (lock && lock_checker < unlock_value) {
-     if(mode.Get() == 2) {
-     if (lock_checker < input_time_1.Get()) {
-     curvature = input_curvature_1.Get();
-     } else if (lock_checker < input_time_2.Get()){
-     curvature = input_curvature_2.Get();
-     } else {
-     curvature = input_curvature_3.Get();
-     }
-     }
-     lock_checker++;
-     } else {
-     lock = false;
-     lock_checker = 0;
-     //call the function fitting the current road type
-     if (mode.Get() == 1) {
-     if (!curve) {
-     curve = true;
-     drive_straight();
-     } else {
-     curve=false;
-     stop();
-     }
-     } else if (mode.Get() == 2) {
-     if (!curve) {
-     curve = true;
-     drive_curve();
-     } else {
-     curve=false;
-     stop();
-     }
-     } else {
-     stop();
-     }
-     }
-     this->out_velocity.Publish(velocity);
-     this->out_curvature.Publish(curvature);*/
+    curvature = 0;
+    std::cout << "Line distance is infinite!" << std::endl;
   }
+  else
+  {
+    expAlgrithm(offset, x);
+    velocity = 0.8;
+  }
+
+
+
+  //this->out_velocity.Publish(velocity);
+  this->out_curvature.Publish(curvature);
+  this->out_noLineDetection.Publish(lineDet.noLineDetection);
+  /*
+   if (mode.Get() == 1) {
+   if (!lock) {
+   lock = true;
+   lock_checker = 0;
+   unlock_value = 245;
+   }
+   drive_straight();
+   } else if (mode.Get() == 2) {
+   if (!lock) {
+   lock = true;
+   lock_checker = 0;
+   unlock_value = time.Get();
+   }
+   drive_curve_1();
+   } else if(mode.Get() == 3) {
+   if (!lock) {
+   lock = true;
+   lock_checker = 0;
+   unlock_value = time.Get();
+   }
+   drive_curve_2();
+   } else {
+   if (!lock) {
+   lock = true;
+   lock_checker = 0;
+   unlock_value = 1000;
+   }
+   stop();
+   }
+   */
+
+  //check for the lock, if lock=true, Publish the same velocity and curvature as last time.
+  /*if (lock && lock_checker < unlock_value) {
+   if(mode.Get() == 2) {
+   if (lock_checker < input_time_1.Get()) {
+   curvature = input_curvature_1.Get();
+   } else if (lock_checker < input_time_2.Get()){
+   curvature = input_curvature_2.Get();
+   } else {
+   curvature = input_curvature_3.Get();
+   }
+   }
+   lock_checker++;
+   } else {
+   lock = false;
+   lock_checker = 0;
+   //call the function fitting the current road type
+   if (mode.Get() == 1) {
+   if (!curve) {
+   curve = true;
+   drive_straight();
+   } else {
+   curve=false;
+   stop();
+   }
+   } else if (mode.Get() == 2) {
+   if (!curve) {
+   curve = true;
+   drive_curve();
+   } else {
+   curve=false;
+   stop();
+   }
+   } else {
+   stop();
+   }
+   }
+   this->out_velocity.Publish(velocity);
+   this->out_curvature.Publish(curvature);*/
+  //}
   //TODO
   /*if (this->InputChanged())
    {
@@ -248,7 +248,7 @@ void mEasyDrive::drive_straight()
   {
     lock = false;
   }
-  this->out_velocity.Publish(velocity);
+  //this->out_velocity.Publish(velocity);
   this->out_curvature.Publish(curvature);
   //this->out_velocity.Publish(1);
   //this->out_velocity.Publish(0);
@@ -447,7 +447,7 @@ void mEasyDrive::stop()
   {
     lock = false;
   }
-  this->out_velocity.Publish(velocity);
+  //this->out_velocity.Publish(velocity);
   this->out_curvature.Publish(curvature);
 }
 
@@ -461,16 +461,19 @@ void LineDetMachine::setLineValue(double m, double r, double l)
 
 void LineDetMachine::chooseLine()
 {
-
   switch (state)
   {
   case MID_LINE:
     if (midValue > midValue_min && midValue < midValue_max)
     {
       state = MID_LINE;
-      x = midValue;
-      velocity = 0.4;
-      offset = 70;
+      //x = midValue;
+      noLineDetection = false;
+      //offset = 67;
+
+      x = midValue; //(midValue+67)/2-67; for low speed
+      offset = mid_offset;
+
       std::cout << "Middle Line Choose =)))" << std::endl;
     }
     else
@@ -483,9 +486,9 @@ void LineDetMachine::chooseLine()
     if (rightValue > rightValue_min && rightValue < rightValue_max)
     {
       state = RIGHT_LINE;
+      noLineDetection = false;
       x = rightValue;
-      velocity = 0.4;
-      offset = -160;
+      offset = right_offset;
       std::cout << "Right Line Choose" << std::endl;
     }
     else if (midValue > midValue_min && midValue < midValue_max)
@@ -502,9 +505,9 @@ void LineDetMachine::chooseLine()
     if (leftValue > leftValue_min && leftValue < leftValue_max)
     {
       state = LEFT_LINE;
+      noLineDetection = false;
       x = leftValue;
-      velocity = 0.4;
-      offset = 300;
+      offset = left_offset;
       std::cout << "Left Line Choose" << std::endl;
     }
     else if (midValue > midValue_min && midValue < midValue_max)
@@ -518,9 +521,10 @@ void LineDetMachine::chooseLine()
     break;
 
   case STOP:
-    velocity = 0;
     offset = 0;
     x = 0;
+    noLineDetection = true;
+    std::cout << noLineDetection << std::endl;
     std::cout << "stop" << std::endl;
     if (midValue > midValue_min && midValue < midValue_max)
     {
@@ -534,6 +538,16 @@ void LineDetMachine::chooseLine()
     {
       state = LEFT_LINE;
     }
+
+    else
+    {
+      state = STOP;
+    }
+    break;
+
+
+  default:
+    std::cout << "screw up" << std::endl;
     break;
   }
 

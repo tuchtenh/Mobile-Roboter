@@ -561,7 +561,7 @@ void mZEDDetection::Update()
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
       cv::imwrite("bildSATURATED.png", outred);
-      outred.convertTo(outred, -1, 3, 0);       // 2
+      outred.convertTo(outred, -1, 2, 0);       // 2
       cv::imwrite("bildContrast.png", outred);
       cv::Mat binaryred;
 

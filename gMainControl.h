@@ -46,6 +46,8 @@
 //----------------------------------------------------------------------
 #include "projects/finroc_projects_robprak2020_2/mEasyDrive.h"
 #include "projects/finroc_projects_robprak2020_2/mZEDDetection.h"
+#include "projects/finroc_projects_robprak2020_2/mVelocityControl.h"
+//#include "projects/finroc_projects_robprak2020_2/mImageDetectorTKDNN.h"
 //----------------------------------------------------------------------
 // Debugging
 //----------------------------------------------------------------------

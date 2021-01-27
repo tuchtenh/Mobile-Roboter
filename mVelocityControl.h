@@ -19,30 +19,29 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    projects/finroc_projects_robprak2020_2/mEasyDrive.h
+/*!\file    projects/finroc_projects_robprak2020_2/mVelocityControl.h
  *
- * \author  Aaron Hackenberg
+ * \author  ChengYi Huang
  *
- * \date    2020-12-03
+ * \date    2021-01-27
  *
- * \brief Contains mEasyDrive
+ * \brief Contains mVelocityControl
  *
- * \b mEasyDrive
+ * \b mVelocityControl
  *
- * This module implements the most basic driving functions without obstacles.
+ * this module is responsible for controlling velocity. velocity=0 or velocity=constant value
  *
  */
 //----------------------------------------------------------------------
-#ifndef __projects__finroc_projects_robprak2020_2__mEasyDrive_h__
-#define __projects__finroc_projects_robprak2020_2__mEasyDrive_h__
+#ifndef __projects__finroc_projects_robprak2020_2__mVelocityControl_h__
+#define __projects__finroc_projects_robprak2020_2__mVelocityControl_h__
 
 #include "plugins/structure/tModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <vector>
-#include <tuple>
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -58,168 +57,78 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
-class LineDetMachine
-{
-
-private:
-
-  enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
-  State state = MID_LINE;
-  double midValue = 0;
-  double rightValue = 0;
-  double leftValue = 0;
-
-  double offset = 0;
-
-  const double midValue_min = -130, midValue_max = 0;
-  const double rightValue_min = 0, rightValue_max = 300;
-  const double leftValue_min = -700, leftValue_max = -120;
-
-  const double mid_offset = 67;
-  const double right_offset = -155;
-  const double left_offset = 308;
-
-  double x;
-
-public:
-  void setLineValue(double m, double r, double l);
-  void chooseLine();
-  double publishOffset();
-  double publishPixel();
-
-  bool noLineDetection = false;
-
-
-
-};
-
 
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
 //! SHORT_DESCRIPTION
 /*!
- * This module implements the most basic driving functions without obstacles.
+ * this module is responsible for controlling velocity. velocity=0 or velocity=constant value
  */
-class mEasyDrive : public structure::tModule
+class mVelocityControl : public structure::tModule
 {
 
 //----------------------------------------------------------------------
 // Ports (These are the only variables that may be declared public)
 //----------------------------------------------------------------------
 public:
+  /*
+    tStaticParameter<double> static_parameter_1;   Example for a static parameter. Replace or delete it!
 
-  //Ouput for the new velocity
-  //tOutput<double> out_velocity;
-  //Ouput for the new curvature
-  tOutput<double> out_curvature;
-  //Ouput for the new light settings
-  tOutput<std::vector<bool>> out_lights;
+    tParameter<double> par_parameter_1;   Example for a runtime parameter named "Parameter 1". Replace or delete it!
 
-  tOutput<bool> out_noLineDetection;
+    tInput<double> in_signal_1;   Example for input ports named "Signal 1" and "Signal 2". Replace or delete them!
+    tInput<double> in_signal_2;
 
-
-  //Input for the line error
-  tInput<std::tuple<double, double, double>> line_error;
-
-
-
-  //enable our instructions
-  tInput<bool> enable;
-  //determines time for the execution of one function
-  tInput<int> time;
-  //determines to drive straight or curve
-  tInput<int> mode;
-
-  tInput<double> line_error_test;
-
-  //inputs for testing
-  tInput<int> input_time_1;
-  tInput<int> input_time_2;
-
-  tInput<double> input_curvature_left;
-  tInput<double> input_curvature_middle;
-  tInput<double> input_curvature_right;
-
-  tInput<double> input_velocity_1;
+    tOutput<double> out_signal_1;   Examples for output ports named "Signal 1" and "Signal 2". Replace or delete them!
+    tOutput<double> out_signal_2;*/
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  mEasyDrive(core::tFrameworkElement *parent, const std::string &name = "EasyDrive");
-  //TODO add correct parameters
-  void drive_straight();
-  void drive_curve_1();
-  void drive_curve_2();
-  void drive_intersection();
+  mVelocityControl(core::tFrameworkElement *parent, const std::string &name = "VelocityControl");
 
-  void ruleBaseAlgrithm();
-  void linearAlgrithm();
-  void powerAlgrithm();
-  void expAlgrithm();
-  void stop();
+  tInput<bool> noLineDetEnable;
+  tInput<bool> stopEnable;
+  tInput<bool> conesDetEnable;
+  tInput<bool> stop_5_secondEnable;
 
-  void expAlgrithm(int offset, double pixelValue);
+  tOutput<double> out_velocity;
+
+
 
 //----------------------------------------------------------------------
 // Protected methods
 //----------------------------------------------------------------------
 protected:
 
+
   /*! Destructor
    *
    * The destructor of modules is declared protected to avoid accidental deletion. Deleting
    * modules is already handled by the framework.
    */
-  virtual ~mEasyDrive();
+  virtual ~mVelocityControl();
 
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
 
-  bool curve;
+  bool noLineDet;
+  bool stop;
 
-  double velocity;
+  //Here is the right place for your variables. Replace this line by your declarations!
 
-  double curvature;
+  virtual void OnStaticParameterChange() override;   //Might be needed to process static parameters. Delete otherwise!
 
-  std::vector<bool> lights;
-
-  int lock_checker;
-
-  int unlock_value;
-
-  bool lock;
-
-  double right_boundary_1;
-  double right_boundary_2;
-  double right_boundary_3;
-  double right_boundary_4;
-  double right_boundary_5;
-
-
-  virtual void OnStaticParameterChange() override;
-
-  virtual void OnParameterChange() override;
+  virtual void OnParameterChange() override;   //Might be needed to react to changes in parameters independent from Update() calls. Delete otherwise!
 
   virtual void Update() override;
 
-
-  LineDetMachine lineDet;
-
-
 };
-
-
-
-
-
-
-
-
 
 //----------------------------------------------------------------------
 // End of namespace declaration
