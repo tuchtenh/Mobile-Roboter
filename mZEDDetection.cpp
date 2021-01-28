@@ -561,7 +561,7 @@ void mZEDDetection::Update()
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
       cv::imwrite("bildSATURATED.png", outred);
-      outred.convertTo(outred, -1, 3, 0);       // 2
+      outred.convertTo(outred, -1, 2, 0);       // 3
       cv::imwrite("bildContrast.png", outred);
       cv::Mat binaryred;
 
@@ -653,7 +653,7 @@ void mZEDDetection::Update()
       std::vector<cv::Point> left_pts, right_pts, mid_pts;
       cv::Vec4d right_line, left_line, mid_line;
       double left, right;
-      left = 250; // 280
+      left =  250;// 280
       right = 340;    // 430
       cv::Point right_b;
       double right_m;
@@ -805,7 +805,7 @@ void mZEDDetection::Update()
       else if (left_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueLeft.push(left_ini_x - midpixel);
-        this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 100))));
+        this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 1000000))));
         queueLeft.pop();
       }
 
@@ -816,7 +816,7 @@ void mZEDDetection::Update()
       else if (mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueMid.push(mid_ini_x - midpixel);
-        this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 100))));
+        this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 1000000))));
         queueMid.pop();
       }
       if (queueRight.size() < 999 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
@@ -826,7 +826,7 @@ void mZEDDetection::Update()
       else if (right_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueRight.push(right_ini_x - midpixel);
-        this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 100))));
+        this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 1000000))));
         queueRight.pop();
       }
 
