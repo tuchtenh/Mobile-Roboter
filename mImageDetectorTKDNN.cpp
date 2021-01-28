@@ -8,12 +8,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -83,12 +83,12 @@ mImageDetectorTKDNN::mImageDetectorTKDNN(core::tFrameworkElement *parent, const 
   tModule(parent, name, false) // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
 {
      detNN = &yolo;
-     
+
      int n_classes = 5;
      n_batch= 1;
      detNN->init("/home/agrosy/Documents/tkDNN/build/Unimog_fp32.rt", n_classes, n_batch, conf_thresh);
-    
-    
+
+
 }
 
 //----------------------------------------------------------------------
@@ -109,7 +109,7 @@ void mImageDetectorTKDNN::OnStaticParameterChange()
 //----------------------------------------------------------------------
 void mImageDetectorTKDNN::OnParameterChange()
 {
-   
+
 
 }
 
@@ -118,21 +118,21 @@ void mImageDetectorTKDNN::OnParameterChange()
 //----------------------------------------------------------------------
 void mImageDetectorTKDNN::Update()
 {
-    
+
  if (this->in_images.HasChanged())
     {
         data_ports::tPortDataPointer<const std::vector<rrlib::coviroa::tImage>> in_img = this->in_images.GetPointer();
         // check if the vector really contains at least one image
         if (in_img->size() > 0){
-            
-            
+
+
             cv::Mat cam_image= rrlib::coviroa::AccessImageAsMat(in_img->at(0));
             cv::Mat cam_image_img;
             cvtColor(cam_image, cam_image_img, CV_BGR2RGB);
-            
+
             bool stopDetect = false, give_wayDetect = false, conesDetect = false, right_of_wayDetect = false, unimogDetect  = false;
             double stopSize = 0.0, give_waySize = 0.0, conesSize = 0.0, right_of_waySize = 0.0, unimogSize = 0.0;
-           
+
             batch_dnn_input.clear();
             batch_frame.clear();
 
@@ -150,12 +150,12 @@ void mImageDetectorTKDNN::Update()
                 switch(d.cl){
                     case 0: //stop
                         stopSize = d.w * d.h;
-                        if(stopSize > 1200){
+                        if(stopSize > 1800){
                             stopDetect = true;
-                            
+
                         }
                         break;
-                    case 1: 
+                    case 1:
                         right_of_waySize = d.w * d.h;
                         if(right_of_waySize > 1200){
                             right_of_wayDetect = true;
@@ -165,7 +165,7 @@ void mImageDetectorTKDNN::Update()
                         give_waySize = d.w * d.h;
                         if(give_waySize > 1200){
                             give_wayDetect = true;
-                            
+
                         }
                         break;
                     case 3:
@@ -191,11 +191,11 @@ void mImageDetectorTKDNN::Update()
             // use the tImage data acs an cv::Mat (does not copy the data)
             cv::Mat out = rrlib::coviroa::AccessImageAsMat(*img_out);
             out = batch_frame[0];
-            
+
             img_out.SetTimestamp(in_img.GetTimestamp());
-           
+
             this->out_image.Publish(img_out);
-            
+
             this-> stop.Publish(stopDetect);
             this-> give_way.Publish(give_wayDetect);
             this-> cones.Publish(conesDetect);
@@ -207,11 +207,11 @@ void mImageDetectorTKDNN::Update()
             this-> cones_size.Publish(conesSize);
             this-> right_of_way_size.Publish(right_of_waySize);
             this-> unimog_size.Publish(unimogSize);
-            
-            
+
+
         }
     }
-    
+
 }
 //----------------------------------------------------------------------
 // End of namespace declaration

@@ -561,7 +561,7 @@ void mZEDDetection::Update()
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
       cv::imwrite("bildSATURATED.png", outred);
-      outred.convertTo(outred, -1, 2, 0);       // 3
+      outred.convertTo(outred, -1, 2, 0);       // 2
       cv::imwrite("bildContrast.png", outred);
       cv::Mat binaryred;
 
@@ -619,14 +619,14 @@ void mZEDDetection::Update()
       cv::Mat mask = cv::Mat::zeros(out.size(), out.type());
       cv::Point pts[4] =
       {
-        cv::Point(230, 270), // links oben
-        cv::Point(340, 270), // rechts oben
+        cv::Point(135, 330), // links oben
+        cv::Point(340, 330), // rechts oben
         //cv::Point(490, 340), // rechts oben
         //cv::Point(520, 270), // rechts oben RC_UNIMOG
         //cv::Point(520, 376), //rechts unten RC_UNIMOG
         cv::Point(340, 376), //rechts unten
         //cv::Point(605, 376), //rechts unten
-        cv::Point(230, 376) //links unten
+        cv::Point(135, 376) //links unten
 
 
 
@@ -653,7 +653,7 @@ void mZEDDetection::Update()
       std::vector<cv::Point> left_pts, right_pts, mid_pts;
       cv::Vec4d right_line, left_line, mid_line;
       double left, right;
-      left =  250;// 280
+      left = 250; //230    // 280
       right = 340;    // 430
       cv::Point right_b;
       double right_m;
@@ -688,7 +688,7 @@ void mZEDDetection::Update()
       {
 
         cv::Vec4i l = lines[i];
-        if (l[2] > left && right > l[2])
+        if (l[2] > 135 && right > l[2])
         {
           mid_lines.push_back(l);
         }
@@ -805,7 +805,7 @@ void mZEDDetection::Update()
       else if (left_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueLeft.push(left_ini_x - midpixel);
-        this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 1000000))));
+        this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 100))));
         queueLeft.pop();
       }
 
@@ -816,7 +816,7 @@ void mZEDDetection::Update()
       else if (mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueMid.push(mid_ini_x - midpixel);
-        this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 1000000))));
+        this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 100))));
         queueMid.pop();
       }
       if (queueRight.size() < 999 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
@@ -826,7 +826,7 @@ void mZEDDetection::Update()
       else if (right_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
         queueRight.push(right_ini_x - midpixel);
-        this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 1000000))));
+        this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 100))));
         queueRight.pop();
       }
 

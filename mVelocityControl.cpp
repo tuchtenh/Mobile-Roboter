@@ -112,21 +112,50 @@ void mVelocityControl::Update()
   noLineDet = noLineDetEnable.Get();
   stop = stopEnable.Get();
 
-  if (noLineDet == true)
+  /*if(noLineDet)
   {
-    out_velocity.Publish(0);
+	  out_velocity.Publish(0);
   }
+  else
+  {
+	  out_velocity.Publish(v);
+  }*/
+  out_velocity.Publish(reactToStopSign(stop));
 
-  else if (stop == true)
+
+/*
+  if (stop == true || stop_lock==true && drive_counter == 100)
   {
 
+    out_velocity.Publish(0);
+    stop_counter++;
+
+    if(stop_counter == 50)
+    {
+    	stop_lock == false;
+    	drive_counter = 0;
+    }
+    else
+    {
+    	stop_lock == true;
+    	stop_counter = 0;
+    }
+  } else if (noLineDet == true)
+  {
     out_velocity.Publish(0);
   }
 
   else
   {
+	if (drive_counter < 100){
+		drive_counter++;
+	}
     out_velocity.Publish(0.8);
   }
+  */
+
+
+
   /*if (this->InputChanged())
   {
     At least one of your input ports has changed. Do something useful with its data.
@@ -136,6 +165,71 @@ void mVelocityControl::Update()
   Do something each cycle independent from changing ports.
 
   this->out_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.*/
+}
+
+double mVelocityControl::reactToStopSign(bool detectStop)
+{
+	switch (stopSignState)
+	{
+		case INIT:
+			v = 1.2;
+			sc = 0;
+			dc = 0;
+
+			if( detectStop == true )
+			{
+				stopSignState = STOP;
+			}
+
+			else
+			{
+				stopSignState = INIT;
+			}
+			break;
+
+		case STOP:
+			v = 0;
+			sc++;
+
+			if( detectStop && sc<=50 )
+			{
+				stopSignState = STOP;
+			}
+			else if(sc>50 )
+			{
+				stopSignState = DRIVE;
+			}
+			else
+			{
+				std::cout<<"STOP sign STOP state bug"<<std::endl;
+			}
+			break;
+
+		case DRIVE:
+			dc++;
+			v=1.2;
+			if(dc<=150)
+			{
+				stopSignState = DRIVE;
+			}
+			else if(dc>150)
+			{
+				stopSignState = INIT;
+			}
+			else
+			{
+				std::cout<<"STOP sign DRIVE state bug"<<std::endl;
+			}
+			break;
+
+		default:
+			std::cout<<"STOP sign reaction wrong"<<std::endl;
+			break;
+
+
+	}
+
+	return v;
 }
 
 //----------------------------------------------------------------------

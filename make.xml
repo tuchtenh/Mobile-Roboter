@@ -7,6 +7,7 @@
       mEasyDrive.cpp
       mZEDDetection.cpp
       mVelocityControl.cpp
+      mImageDetectorTKDNN.cpp
     </sources>
   </finroclibrary>
   <finrocprogram name="finroc_projects_robprak2020_2" libs="tkDNN cuda">

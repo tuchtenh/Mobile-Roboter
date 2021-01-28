@@ -85,7 +85,6 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   mVelocityControl* velocity_control = new mVelocityControl(this);
 
 
-  //new mImageDetectorTKDNN(this);
 
   //ports
   //this->co_velocity.ConnectTo(easy_drive->out_velocity);

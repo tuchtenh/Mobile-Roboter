@@ -471,14 +471,14 @@ void LineDetMachine::chooseLine()
       noLineDetection = false;
       //offset = 67;
 
-      x = midValue; //(midValue+67)/2-67; for low speed
+      x = midValue;
       offset = mid_offset;
 
-      std::cout << "Middle Line Choose =)))" << std::endl;
+      std::cout << "Middle Line Choose =)))..." << std::endl;
     }
     else
     {
-      state = RIGHT_LINE;
+    	state = STOP;
     }
     break;
 

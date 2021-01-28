@@ -118,7 +118,20 @@ protected:
 private:
 
   bool noLineDet;
+
   bool stop;
+  int  stop_counter = 0;
+  bool stop_lock = false;
+  int drive_counter = 100;
+
+
+
+  enum StopSignState{INIT, STOP, DRIVE};
+  StopSignState stopSignState= INIT;
+  double reactToStopSign(bool detectStop);
+  int sc = 0;
+  int dc = 0;
+  double v = 1.2;
 
   //Here is the right place for your variables. Replace this line by your declarations!
 
