@@ -33,6 +33,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "projects/finroc_projects_robprak2020_2/mEasyDrive.h"
+#include "projects/finroc_projects_robprak2020_2/mImageDetectorTKDNN.h"
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -80,7 +81,7 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   mEasyDrive* easy_drive = new mEasyDrive(this);
   mZEDDetection* zed_detection = new mZEDDetection(this);
   //new mZEDDetection(this);
-
+  new mImageDetectorTKDNN(this);
   mVelocityControl* velocity_control = new mVelocityControl(this);
 
 
