@@ -102,6 +102,12 @@ public:
   tOutput<bool> cones;
   tOutput<bool> right_of_way;
   tOutput<bool> unimog;
+  
+  tOutput<double> stop_size;
+  tOutput<double> give_way_size;
+  tOutput<double> cones_size;
+  tOutput<double> right_of_way_size;
+  tOutput<double> unimog_size;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs

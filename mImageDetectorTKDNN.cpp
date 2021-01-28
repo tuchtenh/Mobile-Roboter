@@ -129,7 +129,9 @@ void mImageDetectorTKDNN::Update()
             cv::Mat cam_image= rrlib::coviroa::AccessImageAsMat(in_img->at(0));
             cv::Mat cam_image_img;
             cvtColor(cam_image, cam_image_img, CV_BGR2RGB);
+            
             bool stopDetect = false, give_wayDetect = false, conesDetect = false, right_of_wayDetect = false, unimogDetect  = false;
+            double stopSize = 0.0, give_waySize = 0.0, conesSize = 0.0, right_of_waySize = 0.0, unimogSize = 0.0;
            
             batch_dnn_input.clear();
             batch_frame.clear();
@@ -147,28 +149,34 @@ void mImageDetectorTKDNN::Update()
                 //std::cout<<"found something with class"<<d.cl<<"size:"<<d.w<<" x " <<d.h<<"results:"<<d.h*d.w<<std::endl;
                 switch(d.cl){
                     case 0: //stop
-                        if(d.w * d.h > 1200){
+                        stopSize = d.w * d.h;
+                        if(stopSize > 1200){
                             stopDetect = true;
+                            
                         }
                         break;
                     case 1: 
-                        if(d.w * d.h > 1200){
+                        right_of_waySize = d.w * d.h;
+                        if(right_of_waySize > 1200){
                             right_of_wayDetect = true;
                         }
                         break;
                     case 2:
-                        if(d.w * d.h > 1200){
+                        give_waySize = d.w * d.h;
+                        if(give_waySize > 1200){
                             give_wayDetect = true;
                             
                         }
                         break;
                     case 3:
-                        if(d.w * d.h > 1000){
+                        conesSize = d.w * d.h;
+                        if(conesSize > 1000){
                             conesDetect = true;
                         }
                         break;
                     case 4://unimog
-                        if(d.w * d.h > 5000){
+                        unimogSize = d.w * d.h;
+                        if(unimogSize > 5000){
                             unimogDetect = true;
                         }
                         break;
@@ -194,6 +202,13 @@ void mImageDetectorTKDNN::Update()
             this-> right_of_way.Publish(right_of_wayDetect);
             this-> unimog.Publish(unimogDetect);
 
+            this-> stop_size.Publish(stopSize);
+            this-> give_way_size.Publish(give_waySize);
+            this-> cones_size.Publish(conesSize);
+            this-> right_of_way_size.Publish(right_of_waySize);
+            this-> unimog_size.Publish(unimogSize);
+            
+            
         }
     }
     
