@@ -72,13 +72,9 @@ runtime_construction::tStandardCreateModuleAction<mEasyDrive> cCREATE_ACTION_FOR
 // mEasyDrive constructor
 //----------------------------------------------------------------------
 mEasyDrive::mEasyDrive(core::tFrameworkElement *parent, const std::string &name) :
-  tModule(parent, name, false), velocity(0), curvature(0), lock(false)/*,
- right_boundary_1(90),
- right_boundary_2(70),
- right_boundary_3(50),
- right_boundary_4(30),
- right_boundary_5(10)*/
+  tModule(parent, name, false), velocity(0), curvature(0), lock(false)
 {
+
 
 }
 
@@ -113,122 +109,57 @@ void mEasyDrive::OnParameterChange()
 //----------------------------------------------------------------------
 void mEasyDrive::Update()
 {
-  //std::cout <<  "AAAAA"<<std::endl;
+
   // choose which line to follow
-  lineDet.setLineValue(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-  lineDet.chooseLine();
-  int offset = lineDet.publishOffset();
-  double x = lineDet.publishPixel();
-
-  //follow the line
-  //if (enable.Get())
-  //{
-  /*if (std::isinf(line_error_test.Get())) {
-    velocity = 0;
-    curvature = 0;
-    std::cout<<"Line distance is infinite!"<<std::endl;
-  } else {
-    expAlgrithm();
-    velocity = 0.4;
-  }*/
-
-  if (lineDet.noLineDetection == true) //three lines detection fail
+  /*
+    lineDet.setLineValue(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    lineDet.chooseLine();
+    int distance = lineDet.publishDistance();
+    double pixel = lineDet.publishPixel();
+  */
+  if (test.Get() == true)
   {
-    curvature = 0;
-    std::cout << "Line distance is infinite!" << std::endl;
+    intersectDetPtr->interProcessOn = true;
   }
+
+
+  std::tuple<int, double, bool> lineData(0, 0, false);
+
+  if (intersectDetPtr->interProcessOn == true)
+  {
+    lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  }
+
   else
   {
-    expAlgrithm(offset, x);
-    velocity = 0.8;
+    lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  }
+
+
+  int distance = std::get<0>(lineData);
+  double pixel = std::get<1>(lineData);
+  bool noDetect = std::get<2>(lineData);
+
+
+  if (noDetect == true) //three lines detection fail
+  {
+    curvature = 0;
+    std::cout << "Line distance is infinite." << std::endl;
+  }
+
+  else
+  {
+    expAlgrithm(distance, pixel);
+    //velocity = 0.8;
   }
 
 
 
   //this->out_velocity.Publish(velocity);
   this->out_curvature.Publish(curvature);
-  this->out_noLineDetection.Publish(lineDet.noLineDetection);
-  /*
-   if (mode.Get() == 1) {
-   if (!lock) {
-   lock = true;
-   lock_checker = 0;
-   unlock_value = 245;
-   }
-   drive_straight();
-   } else if (mode.Get() == 2) {
-   if (!lock) {
-   lock = true;
-   lock_checker = 0;
-   unlock_value = time.Get();
-   }
-   drive_curve_1();
-   } else if(mode.Get() == 3) {
-   if (!lock) {
-   lock = true;
-   lock_checker = 0;
-   unlock_value = time.Get();
-   }
-   drive_curve_2();
-   } else {
-   if (!lock) {
-   lock = true;
-   lock_checker = 0;
-   unlock_value = 1000;
-   }
-   stop();
-   }
-   */
+  this->out_noLineDetection.Publish(noDetect);
 
-  //check for the lock, if lock=true, Publish the same velocity and curvature as last time.
-  /*if (lock && lock_checker < unlock_value) {
-   if(mode.Get() == 2) {
-   if (lock_checker < input_time_1.Get()) {
-   curvature = input_curvature_1.Get();
-   } else if (lock_checker < input_time_2.Get()){
-   curvature = input_curvature_2.Get();
-   } else {
-   curvature = input_curvature_3.Get();
-   }
-   }
-   lock_checker++;
-   } else {
-   lock = false;
-   lock_checker = 0;
-   //call the function fitting the current road type
-   if (mode.Get() == 1) {
-   if (!curve) {
-   curve = true;
-   drive_straight();
-   } else {
-   curve=false;
-   stop();
-   }
-   } else if (mode.Get() == 2) {
-   if (!curve) {
-   curve = true;
-   drive_curve();
-   } else {
-   curve=false;
-   stop();
-   }
-   } else {
-   stop();
-   }
-   }
-   this->out_velocity.Publish(velocity);
-   this->out_curvature.Publish(curvature);*/
-  //}
-  //TODO
-  /*if (this->InputChanged())
-   {
-   At least one of your input ports has changed. Do something useful with its data.
-   However, using the .HasChanged() method on each port you can check in more detail.
-   }
 
-   Do something each cycle independent from changing ports.
-
-   this->out_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.*/
 }
 
 //----------------------------------------------------------------------
@@ -236,6 +167,7 @@ void mEasyDrive::Update()
 // Publishes the velocity and curvature necessary to drive
 // in a straight line within a lane
 //----------------------------------------------------------------------
+/*
 void mEasyDrive::drive_straight()
 {
   velocity = 1;
@@ -253,7 +185,7 @@ void mEasyDrive::drive_straight()
   //this->out_velocity.Publish(1);
   //this->out_velocity.Publish(0);
 
-}
+}*/
 //----------------------------------------------------------------------
 // mEasyDrive drive_curve_1
 // Publishes the velocity and curvature necessary to drive
@@ -318,29 +250,29 @@ void mEasyDrive::drive_intersection()
 //----------------------------------------------------------------------
 void mEasyDrive::expAlgrithm()
 {
-
-  int offset = 70;
-  double x = line_error_test.Get() + offset;
-  std::cout << x << std::endl;
-  double a = 0.059;
-  double function = 0;
-  if (x >= 10)
-  {
-    function = -3 * (1 - exp(a * -x));
-  }
-  else if (x <= -10)
-  {
-    function = 3 * (1 - exp(a * x));
-  }
-  curvature = function;
-
+  /*
+    int offset = 70;
+    double x = line_error_test.Get() + offset;
+    std::cout << x << std::endl;
+    double a = 0.059;
+    double function = 0;
+    if (x >= 10)
+    {
+      function = -3 * (1 - exp(a * -x));
+    }
+    else if (x <= -10)
+    {
+      function = 3 * (1 - exp(a * x));
+    }
+    curvature = function;
+  */
 }
 
-void mEasyDrive::expAlgrithm(int offset, double pixelValue)
+void mEasyDrive::expAlgrithm(int distance, double pixelValue)
 {
 
   //offset = 70;
-  double x = pixelValue + offset;
+  double x = pixelValue + distance;
   //std::cout<<x<<std::endl;
   double a = 0.059;
   double function = 0;
@@ -435,7 +367,7 @@ void mEasyDrive::powerAlgrithm()
 // mEasyDrive stop
 // Publishes the velocity and curvature necessary to stop
 //----------------------------------------------------------------------
-void mEasyDrive::stop()
+/*void mEasyDrive::stop()
 {
   velocity = 0;
   curvature = 0;
@@ -450,6 +382,7 @@ void mEasyDrive::stop()
   //this->out_velocity.Publish(velocity);
   this->out_curvature.Publish(curvature);
 }
+*/
 
 void LineDetMachine::setLineValue(double m, double r, double l)
 {
@@ -471,14 +404,14 @@ void LineDetMachine::chooseLine()
       noLineDetection = false;
       //offset = 67;
 
-      x = midValue;
-      offset = mid_offset;
+      pixel = midValue;
+      distance = rLane_mid_distance;
 
-      std::cout << "Middle Line Choose =)))..." << std::endl;
+      std::cout << "Middle Line Choose : )))" << std::endl;
     }
     else
     {
-    	state = STOP;
+      state = RIGHT_LINE;
     }
     break;
 
@@ -487,8 +420,8 @@ void LineDetMachine::chooseLine()
     {
       state = RIGHT_LINE;
       noLineDetection = false;
-      x = rightValue;
-      offset = right_offset;
+      pixel = rightValue;
+      distance = rLane_right_distance;
       std::cout << "Right Line Choose" << std::endl;
     }
     else if (midValue > midValue_min && midValue < midValue_max)
@@ -506,8 +439,8 @@ void LineDetMachine::chooseLine()
     {
       state = LEFT_LINE;
       noLineDetection = false;
-      x = leftValue;
-      offset = left_offset;
+      pixel = leftValue;
+      distance = rLane_left_distance;
       std::cout << "Left Line Choose" << std::endl;
     }
     else if (midValue > midValue_min && midValue < midValue_max)
@@ -521,11 +454,11 @@ void LineDetMachine::chooseLine()
     break;
 
   case STOP:
-    offset = 0;
-    x = 0;
+    distance = 0;
+    pixel = 0;
     noLineDetection = true;
     std::cout << noLineDetection << std::endl;
-    std::cout << "stop" << std::endl;
+    std::cout << "stop,,," << std::endl;
     if (midValue > midValue_min && midValue < midValue_max)
     {
       state = MID_LINE;
@@ -547,22 +480,136 @@ void LineDetMachine::chooseLine()
 
 
   default:
-    std::cout << "screw up" << std::endl;
+    std::cout << "LineDetMachine screw up" << std::endl;
     break;
   }
 
 
 }
 
-double LineDetMachine::publishOffset()
+double LineDetMachine::publishDistance()
 {
-  return offset;
+  return distance;
 }
 
 double LineDetMachine::publishPixel()
 {
-  return x;
+  return pixel;
 }
+
+bool LineDetMachine::publishNoDetect()
+{
+  return noLineDetection;
+}
+
+std::tuple<int, double, bool> LineDetMachine::operation(double m, double r, double l)
+{
+  setLineValue(m, r, l);
+  chooseLine();
+
+  return std::make_tuple(publishDistance(), publishPixel(), publishNoDetect());
+}
+
+
+void IntersectDetMachine::chooseLine()
+{
+  switch (intersectState)
+  {
+  case MID_LINE:
+
+    std::cout << "Intersection turn left" << std::endl;
+    mc++;
+    pixel = midValue;
+    distance = rLane_mid_distance;
+
+    if (mc >= interCounter)
+    {
+      intersectState = RIGHT_LINE;
+      mc = 0;
+      interProcessOn = false;
+
+    }
+
+    else if (midValue < midValue_min || midValue > midValue_max)
+    {
+      intersectState = STOP;
+      stateMemory = MID_LINE;
+      std::cout << "Intersection turn left NO DETECTION" << std::endl;
+    }
+
+
+    else
+    {
+      intersectState = MID_LINE;
+    }
+
+    break;
+
+  case RIGHT_LINE:
+
+    std::cout << "Intersection turn right" << std::endl;
+    rc++;
+    pixel = rightValue;
+    distance = rLane_right_distance;
+
+    if (rc >= interCounter)
+    {
+      intersectState = MID_LINE;
+      rc = 0;
+      interProcessOn = false;
+    }
+
+    else if (rightValue < rightValue_min || rightValue > rightValue_max)
+    {
+      intersectState = STOP;
+      stateMemory = RIGHT_LINE;
+      std::cout << "Intersection turn right NO DETECTION" << std::endl;
+    }
+
+    else
+    {
+      intersectState = RIGHT_LINE;
+    }
+
+    /*else
+    {
+      intersectState = RIGHT_LINE;
+      std::cout << "Intersection turn right" << std::endl;
+      rc++;
+      pixel = rightValue;
+      distance = rLane_right_distance;
+    }*/
+    break;
+
+  case STOP:
+
+    if (midValue >= midValue_min && midValue <= midValue_max && stateMemory == MID_LINE)
+    {
+      intersectState = MID_LINE;
+      noLineDetection = false;
+    }
+    else if (rightValue >= rightValue_min && rightValue <= rightValue_max && stateMemory == RIGHT_LINE)
+    {
+      intersectState = RIGHT_LINE;
+      noLineDetection = false;
+    }
+    else
+    {
+      distance = 0;
+      pixel = 0;
+      noLineDetection = true;
+      std::cout << "Intersection stop" << stateMemory << std::endl;
+    }
+    break;
+
+  default:
+    std::cout << "Intersection state machine screw up" << std::endl;
+    break;
+
+  }
+
+}
+
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------

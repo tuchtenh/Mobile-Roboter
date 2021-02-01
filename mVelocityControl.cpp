@@ -112,47 +112,49 @@ void mVelocityControl::Update()
   noLineDet = noLineDetEnable.Get();
   stop = stopEnable.Get();
 
-  /*if(noLineDet)
+  if (noLineDet)
   {
-	  out_velocity.Publish(0);
+    out_velocity.Publish(0);
   }
   else
   {
-	  out_velocity.Publish(v);
-  }*/
-  out_velocity.Publish(reactToStopSign(stop));
+    out_velocity.Publish(v);
+  }
+
+  //out_velocity.Publish(reactToStopSign(stop));
 
 
-/*
-  if (stop == true || stop_lock==true && drive_counter == 100)
-  {
 
-    out_velocity.Publish(0);
-    stop_counter++;
-
-    if(stop_counter == 50)
+  /*
+    if (stop == true || stop_lock==true && drive_counter == 100)
     {
-    	stop_lock == false;
-    	drive_counter = 0;
+
+      out_velocity.Publish(0);
+      stop_counter++;
+
+      if(stop_counter == 50)
+      {
+        stop_lock == false;
+        drive_counter = 0;
+      }
+      else
+      {
+        stop_lock == true;
+        stop_counter = 0;
+      }
+    } else if (noLineDet == true)
+    {
+      out_velocity.Publish(0);
     }
+
     else
     {
-    	stop_lock == true;
-    	stop_counter = 0;
+    if (drive_counter < 100){
+      drive_counter++;
     }
-  } else if (noLineDet == true)
-  {
-    out_velocity.Publish(0);
-  }
-
-  else
-  {
-	if (drive_counter < 100){
-		drive_counter++;
-	}
-    out_velocity.Publish(0.8);
-  }
-  */
+      out_velocity.Publish(0.8);
+    }
+    */
 
 
 
@@ -169,67 +171,67 @@ void mVelocityControl::Update()
 
 double mVelocityControl::reactToStopSign(bool detectStop)
 {
-	switch (stopSignState)
-	{
-		case INIT:
-			v = 1.2;
-			sc = 0;
-			dc = 0;
+  switch (stopSignState)
+  {
+  case INIT:
+    v = 1.2;
+    sc = 0;
+    dc = 0;
 
-			if( detectStop == true )
-			{
-				stopSignState = STOP;
-			}
+    if (detectStop == true)
+    {
+      stopSignState = STOP;
+    }
 
-			else
-			{
-				stopSignState = INIT;
-			}
-			break;
+    else
+    {
+      stopSignState = INIT;
+    }
+    break;
 
-		case STOP:
-			v = 0;
-			sc++;
+  case STOP:
+    v = 0;
+    sc++;
 
-			if( detectStop && sc<=50 )
-			{
-				stopSignState = STOP;
-			}
-			else if(sc>50 )
-			{
-				stopSignState = DRIVE;
-			}
-			else
-			{
-				std::cout<<"STOP sign STOP state bug"<<std::endl;
-			}
-			break;
+    if (detectStop && sc <= 50)
+    {
+      stopSignState = STOP;
+    }
+    else if (sc > 50)
+    {
+      stopSignState = DRIVE;
+    }
+    else
+    {
+      std::cout << "STOP sign STOP state bug" << std::endl;
+    }
+    break;
 
-		case DRIVE:
-			dc++;
-			v=1.2;
-			if(dc<=150)
-			{
-				stopSignState = DRIVE;
-			}
-			else if(dc>150)
-			{
-				stopSignState = INIT;
-			}
-			else
-			{
-				std::cout<<"STOP sign DRIVE state bug"<<std::endl;
-			}
-			break;
+  case DRIVE:
+    dc++;
+    v = 1.2;
+    if (dc <= 150)
+    {
+      stopSignState = DRIVE;
+    }
+    else if (dc > 150)
+    {
+      stopSignState = INIT;
+    }
+    else
+    {
+      std::cout << "STOP sign DRIVE state bug" << std::endl;
+    }
+    break;
 
-		default:
-			std::cout<<"STOP sign reaction wrong"<<std::endl;
-			break;
+  default:
+    std::cout << "STOP sign reaction wrong" << std::endl;
+    break;
 
 
-	}
+  }
 
-	return v;
+  return v;
 }
 
 //----------------------------------------------------------------------

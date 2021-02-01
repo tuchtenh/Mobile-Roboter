@@ -60,37 +60,65 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 class LineDetMachine
 {
-
 private:
-
   enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
   State state = MID_LINE;
+
+protected:
+
   double midValue = 0;
   double rightValue = 0;
   double leftValue = 0;
 
-  double offset = 0;
+  double distance = 0;
 
+  const double midValue_min = -195, midValue_max = 0; // Max needs tuned
+  const double rightValue_min = 0, rightValue_max = 470;
+  const double leftValue_min = -405, leftValue_max = -120; // Max needs tuned
+
+  /*
   const double midValue_min = -130, midValue_max = 0;
   const double rightValue_min = 0, rightValue_max = 300;
   const double leftValue_min = -700, leftValue_max = -120;
+  */
+  const double rLane_mid_distance = 67;
+  const double rLane_right_distance = -155;
+  const double rLane_left_distance = -295;
 
-  const double mid_offset = 67;
-  const double right_offset = -155;
-  const double left_offset = 308;
-
-  double x;
-
-public:
-  void setLineValue(double m, double r, double l);
-  void chooseLine();
-  double publishOffset();
-  double publishPixel();
+  double pixel;
 
   bool noLineDetection = false;
 
+public:
+  void setLineValue(double m, double r, double l);
+  virtual void chooseLine();
+  double publishDistance();
+  double publishPixel();
+  bool   publishNoDetect();
+  std::tuple<int, double, bool> operation(double m, double r, double l);
 
 
+
+
+
+};
+
+class IntersectDetMachine : public LineDetMachine
+{
+private:
+
+  int mc = 0;
+  int rc = 0;
+  const int interCounter = 100;
+
+  enum IntersectState { MID_LINE = 0, RIGHT_LINE, STOP };
+  IntersectState intersectState = MID_LINE;
+  IntersectState stateMemory = MID_LINE;
+
+
+public:
+  bool interProcessOn = false;
+  void chooseLine();
 };
 
 
@@ -118,7 +146,7 @@ public:
 
   tOutput<bool> out_noLineDetection;
 
-
+  /*
   //Input for the line error
   tInput<std::tuple<double, double, double>> line_error;
 
@@ -136,12 +164,15 @@ public:
   //inputs for testing
   tInput<int> input_time_1;
   tInput<int> input_time_2;
+  */
 
   tInput<double> input_curvature_left;
   tInput<double> input_curvature_middle;
   tInput<double> input_curvature_right;
 
-  tInput<double> input_velocity_1;
+
+  tInput<bool> test;
+  //tInput<double> input_velocity_1;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -161,7 +192,7 @@ public:
   void expAlgrithm();
   void stop();
 
-  void expAlgrithm(int offset, double pixelValue);
+  void expAlgrithm(int distance, double pixelValue);
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -208,7 +239,14 @@ private:
   virtual void Update() override;
 
 
+
+
   LineDetMachine lineDet;
+  LineDetMachine* lineDetPtr = &lineDet;
+
+  IntersectDetMachine intersectDet;
+  IntersectDetMachine* intersectDetPtr = &intersectDet;
+
 
 
 };
