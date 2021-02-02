@@ -108,6 +108,9 @@ public:
   tOutput<double> cones_size;
   tOutput<double> right_of_way_size;
   tOutput<double> unimog_size;
+  
+  tOutput<double> unimog_left_right;
+  tOutput<double> cones_left_right;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -145,7 +148,7 @@ private:
   
   double conf_thresh = 0.6;
   
-  int n_batch =1;
+  int n_batch = 1;
   
   virtual void OnStaticParameterChange() override;   
 
