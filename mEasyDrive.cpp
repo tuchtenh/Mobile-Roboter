@@ -117,6 +117,10 @@ void mEasyDrive::Update()
     int distance = lineDet.publishDistance();
     double pixel = lineDet.publishPixel();
   */
+  std::tuple<int, double, bool> lineData(0, 0, false);
+  lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
+  /*
   if (test.Get() == true)
   {
     intersectDetPtr->interProcessOn = true;
@@ -124,6 +128,9 @@ void mEasyDrive::Update()
 
 
   std::tuple<int, double, bool> lineData(0, 0, false);
+
+  lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
 
   if (intersectDetPtr->interProcessOn == true)
   {
@@ -133,7 +140,7 @@ void mEasyDrive::Update()
   else
   {
     lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-  }
+  }*/
 
 
   int distance = std::get<0>(lineData);
@@ -248,25 +255,7 @@ void mEasyDrive::drive_intersection()
 // Publishes the velocity and curvature necessary to drive
 // back onto the street when an error happen and the line got crossed
 //----------------------------------------------------------------------
-void mEasyDrive::expAlgrithm()
-{
-  /*
-    int offset = 70;
-    double x = line_error_test.Get() + offset;
-    std::cout << x << std::endl;
-    double a = 0.059;
-    double function = 0;
-    if (x >= 10)
-    {
-      function = -3 * (1 - exp(a * -x));
-    }
-    else if (x <= -10)
-    {
-      function = 3 * (1 - exp(a * x));
-    }
-    curvature = function;
-  */
-}
+
 
 void mEasyDrive::expAlgrithm(int distance, double pixelValue)
 {
@@ -608,7 +597,102 @@ void IntersectDetMachine::chooseLine()
 
   }
 
+
+  /*
+  void OverTakeDetMachine::chooseLine()
+  {
+      switch (state)
+      {
+      case MID_LINE:
+        if (midValue > midValue_min && midValue < midValue_max)
+        {
+          state = MID_LINE;
+          //x = midValue;
+          noLineDetection = false;
+          //offset = 67;
+
+          pixel = midValue;
+          distance = lLane_mid_distance;
+
+          std::cout << "Middle Line Choose : ))), OverTake" << std::endl;
+        }
+        else
+        {
+          state = RIGHT_LINE;
+        }
+        break;
+
+      case RIGHT_LINE:
+        if (rightValue > rightValue_min && rightValue < rightValue_max)
+        {
+          state = RIGHT_LINE;
+          noLineDetection = false;
+          pixel = rightValue;
+          distance = lLane_right_distance;
+          std::cout << "Right Line Choose, OverTake" << std::endl;
+        }
+        else if (midValue > midValue_min && midValue < midValue_max)
+        {
+          state = MID_LINE;
+        }
+        else
+        {
+          state = LEFT_LINE;
+        }
+        break;
+
+      case LEFT_LINE:
+        if (leftValue > leftValue_min && leftValue < leftValue_max)
+        {
+          state = LEFT_LINE;
+          noLineDetection = false;
+          pixel = leftValue;
+          distance = lLane_right_distance;
+          std::cout << "Left Line Choose, OverTake" << std::endl;
+        }
+        else if (midValue > midValue_min && midValue < midValue_max)
+        {
+          state = MID_LINE;
+        }
+        else
+        {
+          state = STOP;
+        }
+        break;
+
+      case STOP:
+        distance = 0;
+        pixel = 0;
+        noLineDetection = true;
+        std::cout << noLineDetection << std::endl;
+        std::cout << "stop, OverTake" << std::endl;
+        if (midValue > midValue_min && midValue < midValue_max)
+        {
+          state = MID_LINE;
+        }
+        else if (rightValue > rightValue_min && rightValue < rightValue_max)
+        {
+          state = RIGHT_LINE;
+        }
+        else if (leftValue > leftValue_min && leftValue < leftValue_max)
+        {
+          state = LEFT_LINE;
+        }
+
+        else
+        {
+          state = STOP;
+        }
+        break;
+
+
+      default:
+        std::cout << "OverTakeDetMachine screw up" << std::endl;
+        break;
+  }
+  */
 }
+
 
 //----------------------------------------------------------------------
 // End of namespace declaration

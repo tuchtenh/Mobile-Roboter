@@ -121,6 +121,18 @@ public:
   void chooseLine();
 };
 
+class OverTakeDetMachine : public LineDetMachine
+{
+private:
+  const double lLane_mid_distance = 155;
+  const double lLane_right_distance = 350;
+  const double lLane_left_distance = -67;
+
+public:
+  bool takeoverProcessOn = false;
+  void chooseLine();
+};
+
 
 //----------------------------------------------------------------------
 // Class declaration
@@ -189,7 +201,7 @@ public:
   void ruleBaseAlgrithm();
   void linearAlgrithm();
   void powerAlgrithm();
-  void expAlgrithm();
+
   void stop();
 
   void expAlgrithm(int distance, double pixelValue);
