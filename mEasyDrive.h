@@ -61,10 +61,12 @@ namespace finroc_projects_robprak2020_2
 class LineDetMachine
 {
 private:
-  enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
-  State state = MID_LINE;
+
 
 protected:
+
+  enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
+  State state = MID_LINE;
 
   double midValue = 0;
   double rightValue = 0;
@@ -76,7 +78,18 @@ protected:
   const double rightValue_min = 0, rightValue_max = 470;
   const double leftValue_min = -405, leftValue_max = -120; // Max needs tuned
 
+
+//test/////////////////////////////////////////////////////////////
   /*
+    const double midValue_min = -200, midValue_max = 200;
+      const double rightValue_min = -500, rightValue_max = 500;
+      const double leftValue_min = -600, leftValue_max = 600;
+
+  */
+//test/////////////////////////////////////////////////////////////
+
+
+  /*//previous
   const double midValue_min = -130, midValue_max = 0;
   const double rightValue_min = 0, rightValue_max = 300;
   const double leftValue_min = -700, leftValue_max = -120;
@@ -124,9 +137,16 @@ public:
 class OverTakeDetMachine : public LineDetMachine
 {
 private:
-  const double lLane_mid_distance = 155;
-  const double lLane_right_distance = 350;
-  const double lLane_left_distance = -67;
+  const double lLane_mid_distance = -155;
+  const double lLane_right_distance = -350;
+  const double lLane_left_distance = 67;
+
+  //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
+  //OvertakeState overtakeState = SWITCH_LEFT;
+
+  const double lMidValue_min = -200, lMidValue_max = 200;
+  const double lRightValue_min = -500, lRightValue_max = 500;
+  const double lLeftValue_min = -600, lLeftValue_max = 600;
 
 public:
   bool takeoverProcessOn = false;
@@ -149,41 +169,20 @@ class mEasyDrive : public structure::tModule
 //----------------------------------------------------------------------
 public:
 
-  //Ouput for the new velocity
-  //tOutput<double> out_velocity;
-  //Ouput for the new curvature
+
   tOutput<double> out_curvature;
   //Ouput for the new light settings
   tOutput<std::vector<bool>> out_lights;
 
   tOutput<bool> out_noLineDetection;
 
-  /*
-  //Input for the line error
-  tInput<std::tuple<double, double, double>> line_error;
-
-
-
-  //enable our instructions
-  tInput<bool> enable;
-  //determines time for the execution of one function
-  tInput<int> time;
-  //determines to drive straight or curve
-  tInput<int> mode;
-
-  tInput<double> line_error_test;
-
-  //inputs for testing
-  tInput<int> input_time_1;
-  tInput<int> input_time_2;
-  */
 
   tInput<double> input_curvature_left;
   tInput<double> input_curvature_middle;
   tInput<double> input_curvature_right;
 
 
-  tInput<bool> test;
+  tInput<bool> test_bool;
   //tInput<double> input_velocity_1;
 
 //----------------------------------------------------------------------
@@ -231,18 +230,6 @@ private:
 
   std::vector<bool> lights;
 
-  int lock_checker;
-
-  int unlock_value;
-
-  bool lock;
-
-  double right_boundary_1;
-  double right_boundary_2;
-  double right_boundary_3;
-  double right_boundary_4;
-  double right_boundary_5;
-
 
   virtual void OnStaticParameterChange() override;
 
@@ -258,6 +245,9 @@ private:
 
   IntersectDetMachine intersectDet;
   IntersectDetMachine* intersectDetPtr = &intersectDet;
+
+  OverTakeDetMachine overtakeDet;
+  OverTakeDetMachine* overtakeDetPtr = &overtakeDet;
 
 
 

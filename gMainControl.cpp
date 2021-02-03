@@ -79,15 +79,19 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //create module
   //new mEasyDrive(this);
   mEasyDrive* easy_drive = new mEasyDrive(this);
+
+
   mZEDDetection* zed_detection = new mZEDDetection(this);
-
-
   //new mZEDDetection(this);
-  //mImageDetectorTKDNN*  imageDetector = new mImageDetectorTKDNN(this);
-
 
   mVelocityControl* velocity_control = new mVelocityControl(this);
-  //imageDetector->stop.ConnectTo(velocity_control->stopEnable);
+  velocity_control->noLineDetEnable.ConnectTo(easy_drive->out_noLineDetection);
+  /*
+    mImageDetectorTKDNN*  imageDetector = new mImageDetectorTKDNN(this);
+    imageDetector->stop.ConnectTo(velocity_control->stopEnable);
+  */
+
+
 
 
 
@@ -96,7 +100,7 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //this->co_velocity.ConnectTo(easy_drive->out_velocity);
   //this->co_curvature.ConnectTo(easy_drive->out_curvature);
   //  this->hardware->ci_curvature.ConnectTo(easy_drive->out_curvature);
-  zed_detection->camera_in.ConnectTo(this->si_stereo_cam_image_0);//not working
+  //zed_detection->camera_in.ConnectTo(this->si_stereo_cam_image_0);//not working
   zed_detection->distance_to_mid_out.ConnectTo(easy_drive->input_curvature_middle);
   zed_detection->distance_to_right_out.ConnectTo(easy_drive->input_curvature_right);
   zed_detection->distance_to_left_out.ConnectTo(easy_drive->input_curvature_left);
@@ -104,7 +108,7 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //this->co_velocity.ConnectTo(easy_drive->out_velocity);
   //this->co_curvature.ConnectTo(easy_drive->out_curvature);
 
-  velocity_control->noLineDetEnable.ConnectTo(easy_drive->out_noLineDetection);
+
 
 
 }

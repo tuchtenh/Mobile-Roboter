@@ -19,19 +19,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://finroc.org/xml/1.0/make.dtd">
 <targets>
-   <finroclibrary libs="tkDNN cuda">
+  <finroclibrary libs ="tkDNN cuda">
     <sources>
       gMainControl.cpp
       mEasyDrive.cpp
       mZEDDetection.cpp
       mVelocityControl.cpp
       mImageDetectorTKDNN.cpp
-     </sources>
+    </sources>
   </finroclibrary>
-  <finrocprogram name="finroc_projects_robprak2020_2" libs="tkDNN cuda">
+  <finrocprogram name="finroc_projects_robprak2020_2" libs ="tkDNN cuda">
     <sources>
       pUnimogControl.cpp
     </sources>
   </finrocprogram>
 </targets>
+-->
+<!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://finroc.org/xml/1.0/make.dtd">
+<targets>
+  <finroclibrary>
+    <sources>
+      gMainControl.cpp
+      mEasyDrive.cpp
+      mZEDDetection.cpp
+      mVelocityControl.cpp
+    </sources>
+  </finroclibrary>
+  <finrocprogram name="finroc_projects_robprak2020_2">
+    <sources>
+      pUnimogControl.cpp
+    </sources>
+  </finrocprogram>
+</targets>
+-->
+<!--
 -->

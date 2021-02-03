@@ -72,7 +72,7 @@ runtime_construction::tStandardCreateModuleAction<mEasyDrive> cCREATE_ACTION_FOR
 // mEasyDrive constructor
 //----------------------------------------------------------------------
 mEasyDrive::mEasyDrive(core::tFrameworkElement *parent, const std::string &name) :
-  tModule(parent, name, false), velocity(0), curvature(0), lock(false)
+  tModule(parent, name, false), velocity(0), curvature(0)
 {
 
 
@@ -111,14 +111,12 @@ void mEasyDrive::Update()
 {
 
   // choose which line to follow
-  /*
-    lineDet.setLineValue(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-    lineDet.chooseLine();
-    int distance = lineDet.publishDistance();
-    double pixel = lineDet.publishPixel();
-  */
+
+
   std::tuple<int, double, bool> lineData(0, 0, false);
   lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  //lineData = overtakeDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
 
   /*
   if (test.Get() == true)
@@ -141,6 +139,8 @@ void mEasyDrive::Update()
   {
     lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
   }*/
+
+
 
 
   int distance = std::get<0>(lineData);
@@ -169,78 +169,7 @@ void mEasyDrive::Update()
 
 }
 
-//----------------------------------------------------------------------
-// mEasyDrive drive_straight
-// Publishes the velocity and curvature necessary to drive
-// in a straight line within a lane
-//----------------------------------------------------------------------
-/*
-void mEasyDrive::drive_straight()
-{
-  velocity = 1;
-  curvature = 0;
-  if (lock_checker < unlock_value)
-  {
-    lock_checker++;
-  }
-  else
-  {
-    lock = false;
-  }
-  //this->out_velocity.Publish(velocity);
-  this->out_curvature.Publish(curvature);
-  //this->out_velocity.Publish(1);
-  //this->out_velocity.Publish(0);
 
-}*/
-//----------------------------------------------------------------------
-// mEasyDrive drive_curve_1
-// Publishes the velocity and curvature necessary to drive
-// in a curve within a lane
-//----------------------------------------------------------------------
-/*void mEasyDrive::drive_curve_1() {
-  velocity = input_velocity_1.Get();
-  if (lock_checker < input_time_1.Get()) {
-    curvature = input_curvature_1.Get();
-  } else if (lock_checker < input_time_2.Get()) {
-    curvature = input_curvature_2.Get();
-  } else {
-    curvature = input_curvature_3.Get();
-  }
-  if (lock_checker < unlock_value) {
-    lock_checker++;
-  } else {
-    lock = false;
-  }
-  this->out_velocity.Publish(velocity);
-  this->out_curvature.Publish(curvature);
-  //this->out_velocity.Publish(1);
-  //this->out_curvature.Publish(1.3);
-}*/
-//----------------------------------------------------------------------
-// mEasyDrive drive_curve_2
-// Publishes the inverse velocity and curvature necessary to drive
-// in a curve within a lane
-//----------------------------------------------------------------------
-/*void mEasyDrive::drive_curve_2() {
-  velocity = input_velocity_1.Get();
-  if (lock_checker < time.Get() - input_time_2.Get()) {
-    curvature = input_curvature_3.Get();
-  } else if (lock_checker < time.Get() - input_time_1.Get()) {
-    curvature = input_curvature_2.Get();
-  } else {
-    curvature = input_curvature_1.Get();
-  }
-  if (lock_checker < unlock_value) {
-    lock_checker++;
-  } else {
-    lock = false;
-  }
-  this->out_velocity.Publish(velocity);
-  this->out_curvature.Publish(curvature);
-  //this->out_velocity.Publish(1);
-  //this->out_curvature.Publish(1.3);
-}*/
 //----------------------------------------------------------------------
 // mEasyDrive drive_intersection
 // Publishes the velocity and curvature necessary to drive
@@ -352,26 +281,7 @@ void mEasyDrive::powerAlgrithm()
   curvature = function;*/
 
 }
-//----------------------------------------------------------------------
-// mEasyDrive stop
-// Publishes the velocity and curvature necessary to stop
-//----------------------------------------------------------------------
-/*void mEasyDrive::stop()
-{
-  velocity = 0;
-  curvature = 0;
-  if (lock_checker < unlock_value)
-  {
-    lock_checker++;
-  }
-  else
-  {
-    lock = false;
-  }
-  //this->out_velocity.Publish(velocity);
-  this->out_curvature.Publish(curvature);
-}
-*/
+
 
 void LineDetMachine::setLineValue(double m, double r, double l)
 {
@@ -597,100 +507,101 @@ void IntersectDetMachine::chooseLine()
 
   }
 
+}
 
-  /*
-  void OverTakeDetMachine::chooseLine()
+void OverTakeDetMachine::chooseLine()
+{
+  switch (state)
   {
-      switch (state)
-      {
-      case MID_LINE:
-        if (midValue > midValue_min && midValue < midValue_max)
-        {
-          state = MID_LINE;
-          //x = midValue;
-          noLineDetection = false;
-          //offset = 67;
+  case MID_LINE:
+    if (midValue > lMidValue_min && midValue < lMidValue_max)
+    {
+      state = MID_LINE;
+      //x = midValue;
+      noLineDetection = false;
+      //offset = 67;
 
-          pixel = midValue;
-          distance = lLane_mid_distance;
+      pixel = midValue;
+      distance = lLane_mid_distance;
 
-          std::cout << "Middle Line Choose : ))), OverTake" << std::endl;
-        }
-        else
-        {
-          state = RIGHT_LINE;
-        }
-        break;
+      std::cout << "Middle Line Choose for OverTake: )))" << std::endl;
+    }
+    else
+    {
+      state = RIGHT_LINE;
+    }
+    break;
 
-      case RIGHT_LINE:
-        if (rightValue > rightValue_min && rightValue < rightValue_max)
-        {
-          state = RIGHT_LINE;
-          noLineDetection = false;
-          pixel = rightValue;
-          distance = lLane_right_distance;
-          std::cout << "Right Line Choose, OverTake" << std::endl;
-        }
-        else if (midValue > midValue_min && midValue < midValue_max)
-        {
-          state = MID_LINE;
-        }
-        else
-        {
-          state = LEFT_LINE;
-        }
-        break;
+  case RIGHT_LINE:
+    if (rightValue > lRightValue_min && rightValue < lRightValue_max)
+    {
+      state = RIGHT_LINE;
+      noLineDetection = false;
+      pixel = rightValue;
+      distance = lLane_right_distance;
+      std::cout << "Right Line Choose for OverTake" << std::endl;
+    }
+    else if (midValue > lMidValue_min && midValue < lMidValue_max)
+    {
+      state = MID_LINE;
+    }
+    else
+    {
+      state = LEFT_LINE;
+    }
+    break;
 
-      case LEFT_LINE:
-        if (leftValue > leftValue_min && leftValue < leftValue_max)
-        {
-          state = LEFT_LINE;
-          noLineDetection = false;
-          pixel = leftValue;
-          distance = lLane_right_distance;
-          std::cout << "Left Line Choose, OverTake" << std::endl;
-        }
-        else if (midValue > midValue_min && midValue < midValue_max)
-        {
-          state = MID_LINE;
-        }
-        else
-        {
-          state = STOP;
-        }
-        break;
+  case LEFT_LINE:
+    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      state = LEFT_LINE;
+      noLineDetection = false;
+      pixel = leftValue;
+      distance = lLane_left_distance;
+      std::cout << "Left Line Choose for OverTake" << std::endl;
+    }
+    else if (midValue > lMidValue_min && midValue < lMidValue_max)
+    {
+      state = RIGHT_LINE;
+    }
+    else
+    {
+      state = STOP;
+    }
+    break;
 
-      case STOP:
-        distance = 0;
-        pixel = 0;
-        noLineDetection = true;
-        std::cout << noLineDetection << std::endl;
-        std::cout << "stop, OverTake" << std::endl;
-        if (midValue > midValue_min && midValue < midValue_max)
-        {
-          state = MID_LINE;
-        }
-        else if (rightValue > rightValue_min && rightValue < rightValue_max)
-        {
-          state = RIGHT_LINE;
-        }
-        else if (leftValue > leftValue_min && leftValue < leftValue_max)
-        {
-          state = LEFT_LINE;
-        }
+  case STOP:
+    distance = 0;
+    pixel = 0;
+    noLineDetection = true;
+    std::cout << noLineDetection << std::endl;
+    std::cout << "stop,,, for Intersect" << std::endl;
+    if (midValue > lMidValue_min && midValue < lMidValue_max)
+    {
+      state = MID_LINE;
+    }
+    else if (rightValue > lRightValue_min && rightValue < lRightValue_max)
+    {
+      state = RIGHT_LINE;
+    }
+    else if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      state = LEFT_LINE;
+    }
 
-        else
-        {
-          state = STOP;
-        }
-        break;
+    else
+    {
+      state = STOP;
+    }
+    break;
 
 
-      default:
-        std::cout << "OverTakeDetMachine screw up" << std::endl;
-        break;
+  default:
+    std::cout << "OverTakeDetMachine screw up" << std::endl;
+    break;
   }
-  */
+
+
 }
 
 

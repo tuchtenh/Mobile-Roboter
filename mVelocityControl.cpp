@@ -110,7 +110,7 @@ void mVelocityControl::OnParameterChange()
 void mVelocityControl::Update()
 {
   noLineDet = noLineDetEnable.Get();
-  stop = stopEnable.Get();
+  stopDet = stopEnable.Get();
 
   if (noLineDet)
   {
@@ -118,7 +118,27 @@ void mVelocityControl::Update()
   }
   else
   {
-    out_velocity.Publish(v);
+    if (stopDet)
+    {
+      out_velocity.Publish(reactToStopSign(stopDet));
+    }
+
+    else
+    {
+      if (stopProcessOn)
+      {
+        out_velocity.Publish(reactToStopSign(stopDet));
+      }
+
+      else
+      {
+        out_velocity.Publish(commenVelocity);
+      }
+    }
+
+
+
+
   }
 
   //out_velocity.Publish(reactToStopSign(stop));
@@ -171,33 +191,30 @@ void mVelocityControl::Update()
 
 double mVelocityControl::reactToStopSign(bool detectStop)
 {
+  double v;
+
   switch (stopSignState)
   {
   case INIT:
-    v = 1.2;
+    v = commenVelocity;
     sc = 0;
     dc = 0;
+    stopProcessOn = true;
+    std::cout << "STOP sign Prcess On" << std::endl;
 
-    if (detectStop == true)
-    {
-      stopSignState = STOP;
-    }
+    stopSignState = STOP;
 
-    else
-    {
-      stopSignState = INIT;
-    }
     break;
 
   case STOP:
     v = 0;
     sc++;
 
-    if (detectStop && sc <= 50)
+    if (sc <= scValue)
     {
       stopSignState = STOP;
     }
-    else if (sc > 50)
+    else if (sc > scValue)
     {
       stopSignState = DRIVE;
     }
@@ -209,14 +226,16 @@ double mVelocityControl::reactToStopSign(bool detectStop)
 
   case DRIVE:
     dc++;
-    v = 1.2;
-    if (dc <= 150)
+    v = commenVelocity;
+    if (dc <= dcValue)
     {
       stopSignState = DRIVE;
     }
-    else if (dc > 150)
+    else if (dc > dcValue)
     {
       stopSignState = INIT;
+      stopProcessOn = false;
+      std::cout << "STOP sign Prcess Off" << std::endl;
     }
     else
     {

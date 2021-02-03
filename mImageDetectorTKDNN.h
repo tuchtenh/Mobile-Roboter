@@ -1,4 +1,5 @@
 //
+//
 // You received this file as part of Finroc
 // A framework for intelligent robot control
 //
@@ -8,12 +9,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -102,7 +103,7 @@ public:
   tOutput<bool> cones;
   tOutput<bool> right_of_way;
   tOutput<bool> unimog;
-  
+
   tOutput<double> stop_size;
   tOutput<double> give_way_size;
   tOutput<double> cones_size;
@@ -133,21 +134,21 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  tk::dnn::DetectionNN *detNN; 
-  
+  tk::dnn::DetectionNN *detNN;
+
   tk::dnn::Yolo3Detection yolo;
-  
+
   std::vector<cv::Mat> batch_frame;
-  
+
   std::vector<cv::Mat> batch_dnn_input;
-  
+
   std::vector<tk::dnn::box> detected_bbox;
-  
+
   double conf_thresh = 0.6;
-  
-  int n_batch =1;
-  
-  virtual void OnStaticParameterChange() override;   
+
+  int n_batch = 1;
+
+  virtual void OnStaticParameterChange() override;
 
   virtual void OnParameterChange() override;
 

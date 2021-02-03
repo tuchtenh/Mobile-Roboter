@@ -72,16 +72,6 @@ class mVelocityControl : public structure::tModule
 // Ports (These are the only variables that may be declared public)
 //----------------------------------------------------------------------
 public:
-  /*
-    tStaticParameter<double> static_parameter_1;   Example for a static parameter. Replace or delete it!
-
-    tParameter<double> par_parameter_1;   Example for a runtime parameter named "Parameter 1". Replace or delete it!
-
-    tInput<double> in_signal_1;   Example for input ports named "Signal 1" and "Signal 2". Replace or delete them!
-    tInput<double> in_signal_2;
-
-    tOutput<double> out_signal_1;   Examples for output ports named "Signal 1" and "Signal 2". Replace or delete them!
-    tOutput<double> out_signal_2;*/
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -117,21 +107,29 @@ protected:
 //----------------------------------------------------------------------
 private:
 
+  const double commenVelocity = 1.2;
+
   bool noLineDet;
 
-  bool stop;
-  int  stop_counter = 0;
-  bool stop_lock = false;
-  int drive_counter = 100;
+  //  STOP sign parameters   ////////////////////////////////////////////////////////////////////////////
+  bool stopDet;
+  bool stopProcessOn = false;
 
-
-
-  enum StopSignState{INIT, STOP, DRIVE};
-  StopSignState stopSignState= INIT;
+  enum StopSignState {INIT, STOP, DRIVE};
+  StopSignState stopSignState = INIT;
   double reactToStopSign(bool detectStop);
   int sc = 0;
   int dc = 0;
-  double v = 1.2;
+
+  const int scValue = 50;
+  const int dcValue = 30;
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
   //Here is the right place for your variables. Replace this line by your declarations!
 
