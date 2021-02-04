@@ -125,6 +125,24 @@ private:
   std::queue <double> queueMid;
   std::queue <double> queueLeft;
 
+  double left_red_x = 0;
+  double right_red_x = 672;
+  double left_red_y = 300;
+  double right_red_y = 300;
+
+  double left_white_x = 170;
+  double right_white_x = 380;
+  double left_white_y = 330;
+  double right_white_y = 330;
+
+  double red_detection_threshold = 350;
+
+  double gray_treshold = 128;
+
+  double M = -70;
+  double m = 0.5;
+  double a = 0;
+
 };
 
 //----------------------------------------------------------------------

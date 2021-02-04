@@ -110,37 +110,51 @@ void mEasyDrive::OnParameterChange()
 void mEasyDrive::Update()
 {
 
+  double m = 0.5;
+  double M;
+  double a;
+  M = input_curvature_middle.Get();
+  //M = block_move.Get();
+  a = m * (M + 70);
+  block_move_easyDrive.Publish(a);
   // choose which line to follow
 
 
   std::tuple<int, double, bool> lineData(0, 0, false);
-  lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-  //lineData = overtakeDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  //lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  //lineData = overTakeDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
 
-
-  /*
-  if (test.Get() == true)
+  if (test_bool.Get() == false)
   {
-    intersectDetPtr->interProcessOn = true;
-  }
-
-
-  std::tuple<int, double, bool> lineData(0, 0, false);
-
-  lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-
-
-  if (intersectDetPtr->interProcessOn == true)
-  {
-    lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
   }
 
   else
   {
-    lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
-  }*/
+    lineData = overTakeDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+  }
 
 
+
+  /*
+
+    if (test_bool.Get() == true)
+    {
+      intersectDetPtr->interProcessOn = true;
+    }
+
+
+    if (intersectDetPtr->interProcessOn == true)
+    {
+      lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    }
+
+    else
+    {
+      lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    }
+
+  */
 
 
   int distance = std::get<0>(lineData);
@@ -151,7 +165,7 @@ void mEasyDrive::Update()
   if (noDetect == true) //three lines detection fail
   {
     curvature = 0;
-    std::cout << "Line distance is infinite." << std::endl;
+    std::cout << "Line distance is infinite =) =)" << std::endl;
   }
 
   else
@@ -189,10 +203,11 @@ void mEasyDrive::drive_intersection()
 void mEasyDrive::expAlgrithm(int distance, double pixelValue)
 {
 
-  //offset = 70;
+
   double x = pixelValue + distance;
   //std::cout<<x<<std::endl;
-  double a = 0.059;
+  //double a = 0.059;
+  double a = 0.01;
   double function = 0;
   if (x >= 0)
   {
@@ -261,24 +276,22 @@ void mEasyDrive::linearAlgrithm()
 
 }
 
-void mEasyDrive::powerAlgrithm()
+void mEasyDrive::powerAlgrithm(int distance, double pixelValue)
 {
-  //double x = std::get<2>(line_error.Get());
-  //double function = c * (x*x*x) with x = (line_error + offset) /
-  //for the middle line choose c = -0,1 and d = 19 and offset = 60
-  //for the left line choose c = 0.1 and d = 19 and offset = 270 (not finished yet!!!!!)
-  //for the right line choose c = ? and d = ? and offset = ?
-  //shouldn it all be the same except for the offset? The change should have the same size right?
-  /*int offset = time.Get();
-  double d = 1;
-  if (input_curvature_2.Get() != 0) {
-    d = input_curvature_2.Get();
+  //double x = pixelValue + distance;
+
+  double function = 0;
+  /*if (x >= 0)
+  {
+    function = -3 * (1 - exp(a * -x));
   }
-  double x = (line_error_test.Get() + offset) / d;
-  double c = input_curvature_1.Get();
-  double function = c * (x * x * x);
-  std::cout << "result: " << function << std::endl;
-  curvature = function;*/
+
+  else
+  {
+    function = 3 * (1 - exp(a * x));
+  }*/
+
+  curvature = function;
 
 }
 
@@ -293,6 +306,73 @@ void LineDetMachine::setLineValue(double m, double r, double l)
 
 void LineDetMachine::chooseLine()
 {
+  switch (state)
+  {
+  case RIGHT_LINE:
+    if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      state = RIGHT_LINE;
+      noLineDetection = false;
+      pixel = rightValue;
+      distance = rLane_right_distance;
+      std::cout << "Right Line Choose" << std::endl;
+    }
+
+    else
+    {
+      state = LEFT_LINE;
+    }
+    break;
+
+  case LEFT_LINE:
+    if (leftValue > leftValue_min && leftValue < leftValue_max)
+    {
+      state = LEFT_LINE;
+      noLineDetection = false;
+      pixel = leftValue;
+      distance = rLane_left_distance;
+      std::cout << "Left Line Choose" << std::endl;
+    }
+    else if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      state = RIGHT_LINE;
+    }
+    else
+    {
+      state = STOP;
+    }
+    break;
+
+  case STOP:
+    distance = 0;
+    pixel = 0;
+    noLineDetection = true;
+    std::cout << noLineDetection << std::endl;
+    std::cout << "stop," << std::endl;
+
+    if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      state = RIGHT_LINE;
+    }
+    else if (leftValue > leftValue_min && leftValue < leftValue_max)
+    {
+      state = LEFT_LINE;
+    }
+
+    else
+    {
+      state = STOP;
+    }
+    break;
+
+
+  default:
+    std::cout << "LineDetMachine screw up" << std::endl;
+    break;
+
+  }
+
+  /*
   switch (state)
   {
   case MID_LINE:
@@ -381,7 +461,8 @@ void LineDetMachine::chooseLine()
   default:
     std::cout << "LineDetMachine screw up" << std::endl;
     break;
-  }
+
+  }*/
 
 
 }
@@ -412,6 +493,121 @@ std::tuple<int, double, bool> LineDetMachine::operation(double m, double r, doub
 
 void IntersectDetMachine::chooseLine()
 {
+  switch (intersectState)
+  {
+  case MID_LINE:
+
+    std::cout << "Intersection turn left MID_LINE" << std::endl;
+    mc++;
+    pixel = midValue;
+    distance = rLane_mid_distance;
+
+    if (mc >= interCounter)
+    {
+      intersectState = RIGHT_LINE;
+      mc = 0;
+      interProcessOn = false;
+    }
+
+    else if (midValue < midValue_min || midValue > midValue_max)
+    {
+      intersectState = LEFT_LINE;
+      stateMemory = MID_LINE;
+      std::cout << "Intersection turn left LEFT_LINE" << std::endl;
+    }
+
+    else
+    {
+      intersectState = MID_LINE;
+    }
+    break;
+
+  case LEFT_LINE:
+    std::cout << "Intersection turn left LEFT_LINE" << std::endl;
+    mc++;
+    pixel = leftValue;
+    distance = rLane_left_distance;
+
+    if (mc >= interCounter || (midValue >= midValue_min && midValue <= midValue_max))
+    {
+      intersectState = MID_LINE;
+    }
+    else if (leftValue < leftValue_min || leftValue > leftValue_max)
+    {
+      intersectState = STOP;
+      stateMemory = MID_LINE;
+    }
+    else
+    {
+      intersectState = LEFT_LINE;
+    }
+
+    break;
+
+  case RIGHT_LINE:
+
+    std::cout << "Intersection turn right" << std::endl;
+    rc++;
+    pixel = rightValue;
+    distance = rLane_right_distance;
+
+    if (rc >= interCounter)
+    {
+      intersectState = MID_LINE;
+      rc = 0;
+      interProcessOn = false;
+    }
+
+    else if (rightValue < rightValue_min || rightValue > rightValue_max)
+    {
+      intersectState = STOP;
+      stateMemory = RIGHT_LINE;
+      std::cout << "Intersection turn right NO DETECTION" << std::endl;
+    }
+
+    else
+    {
+      intersectState = RIGHT_LINE;
+    }
+
+
+    break;
+
+  case STOP:
+
+    if (midValue >= midValue_min && midValue <= midValue_max && stateMemory == MID_LINE)
+    {
+      intersectState = MID_LINE;
+      noLineDetection = false;
+    }
+
+    else if (leftValue >= leftValue_min && leftValue <= leftValue_max && stateMemory == MID_LINE)
+    {
+      intersectState = LEFT_LINE;
+      noLineDetection = false;
+    }
+    else if (rightValue >= rightValue_min && rightValue <= rightValue_max && stateMemory == RIGHT_LINE)
+    {
+      intersectState = RIGHT_LINE;
+      noLineDetection = false;
+    }
+
+
+    else
+    {
+      distance = 0;
+      pixel = 0;
+      noLineDetection = true;
+      std::cout << "Intersection stop  " << stateMemory << std::endl;
+    }
+    break;
+
+  default:
+    std::cout << "Intersection state machine screw up" << std::endl;
+    break;
+  }
+
+  /*
   switch (intersectState)
   {
   case MID_LINE:
@@ -470,14 +666,7 @@ void IntersectDetMachine::chooseLine()
       intersectState = RIGHT_LINE;
     }
 
-    /*else
-    {
-      intersectState = RIGHT_LINE;
-      std::cout << "Intersection turn right" << std::endl;
-      rc++;
-      pixel = rightValue;
-      distance = rLane_right_distance;
-    }*/
+
     break;
 
   case STOP:
@@ -505,12 +694,81 @@ void IntersectDetMachine::chooseLine()
     std::cout << "Intersection state machine screw up" << std::endl;
     break;
 
-  }
+  }*/
 
 }
 
 void OverTakeDetMachine::chooseLine()
 {
+  switch (overTakeState)
+  {
+  case LEFT_LINE:
+
+    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      overTakeState = LEFT_LINE;
+      noLineDetection = false;
+      pixel = leftValue;
+      distance = lLane_left_distance;
+      std::cout << "Left Line Choose for OverTake" << std::endl;
+    }
+    else
+    {
+      overTakeState = RIGHT_LINE;
+    }
+
+    break;
+
+  case RIGHT_LINE:
+
+    if (rightValue > lRightValue_min && rightValue < lRightValue_max)
+    {
+      overTakeState = RIGHT_LINE;
+      noLineDetection = false;
+      pixel = rightValue;
+      distance = lLane_right_distance;
+      std::cout << "Right Line Choose for OverTake" << std::endl;
+    }
+    else if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      overTakeState = LEFT_LINE;
+    }
+    else
+    {
+      overTakeState = STOP;
+    }
+    break;
+
+
+
+  case STOP:
+
+    distance = 0;
+    pixel = 0;
+    noLineDetection = true;
+    std::cout << "stop, for Intersect" << std::endl;
+
+    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      overTakeState = LEFT_LINE;
+    }
+    else if (rightValue > lRightValue_min && rightValue < lRightValue_max)
+    {
+      overTakeState = RIGHT_LINE;
+    }
+
+    else
+    {
+      overTakeState = STOP;
+    }
+    break;
+
+
+  default:
+    std::cout << "OverTakeDetMachine screw up" << std::endl;
+    break;
+  }
+  /*
   switch (state)
   {
   case MID_LINE:
@@ -600,6 +858,8 @@ void OverTakeDetMachine::chooseLine()
     std::cout << "OverTakeDetMachine screw up" << std::endl;
     break;
   }
+
+  */
 
 
 }

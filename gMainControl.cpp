@@ -108,7 +108,7 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //this->co_velocity.ConnectTo(easy_drive->out_velocity);
   //this->co_curvature.ConnectTo(easy_drive->out_curvature);
 
-
+  //zed_detection->block_move.ConnectTo(easy_drive->block_move_easyDrive);
 
 
 }

@@ -580,17 +580,21 @@ void mZEDDetection::Update()
       cv::Mat maskred = cv::Mat::zeros(outred.size(), outred.type());
       cv::Point ptsred[4] =
       {
-        cv::Point(0, 270), // links oben
-        cv::Point(672, 270), // rechts oben
-        //cv::Point(490, 340), // rechts oben
-        //cv::Point(520, 270), // rechts oben RC_UNIMOG
-        //cv::Point(520, 376), //rechts unten RC_UNIMOG
-        cv::Point(672, 376), //rechts unten
-        //cv::Point(605, 376), //rechts unten
-        cv::Point(0, 376) //links unten
+        /*
+          cv::Point(0, 270), // links oben
+          cv::Point(672, 270), // rechts oben
+          //cv::Point(490, 340), // rechts oben
+          //cv::Point(520, 270), // rechts oben RC_UNIMOG
+          //cv::Point(520, 376), //rechts unten RC_UNIMOG
+          cv::Point(672, 376), //rechts unten
+          //cv::Point(605, 376), //rechts unten
+          cv::Point(0, 376) //links unten
+        */
 
-
-
+        cv::Point(left_red_x, left_red_y), // 270 links oben
+        cv::Point(right_red_x, right_red_y), // 270 rechts oben
+        cv::Point(right_red_x, 376), //rechts unten
+        cv::Point(left_red_x, 376) //links unten
 
 
       };
@@ -608,25 +612,44 @@ void mZEDDetection::Update()
       //___________________________________________________________________
       // Detection of white middle lane
 
+      cv::GaussianBlur(out, out, cv::Size(5, 5), 0);
       // turn the image to grayscale
       cv::cvtColor(out, out, cv::COLOR_BGR2GRAY);
       cv::imwrite("bildGRAY.png", out);
 
-      cv::threshold(out, out, 128, 255, cv::THRESH_BINARY);
+      cv::threshold(out, out, gray_treshold, 255, cv::THRESH_BINARY); // 128
       cv::imwrite("bildBINRAY.png", out);
 
       //masking the image white
       cv::Mat mask = cv::Mat::zeros(out.size(), out.type());
+
+      a = m * (M + 70);
+
       cv::Point pts[4] =
       {
-        cv::Point(135, 330), // links oben
-        cv::Point(340, 330), // rechts oben
-        //cv::Point(490, 340), // rechts oben
-        //cv::Point(520, 270), // rechts oben RC_UNIMOG
-        //cv::Point(520, 376), //rechts unten RC_UNIMOG
-        cv::Point(340, 376), //rechts unten
-        //cv::Point(605, 376), //rechts unten
-        cv::Point(135, 376) //links unten
+
+        cv::Point(left_white_x + a, left_white_y), // links oben
+        cv::Point(right_white_x + a, right_white_y), // rechts oben
+        cv::Point(right_white_x + a, 376), //rechts unten
+        cv::Point(left_white_x + a, 376) //links unten
+        /*
+          cv::Point(135, 330), // links oben
+          cv::Point(340, 330), // rechts oben
+          //cv::Point(490, 340), // rechts oben
+          //cv::Point(520, 270), // rechts oben RC_UNIMOG
+          //cv::Point(520, 376), //rechts unten RC_UNIMOG
+          cv::Point(340, 376), //rechts unten
+          //cv::Point(605, 376), //rechts unten
+          cv::Point(135, 376) //links unten
+          */
+
+        /*
+         cv::Point(left_white_x, left_white_y), // links oben
+         cv::Point(right_white_x, right_white_y), // rechts oben
+         cv::Point(right_white_x, 376), //rechts unten
+         cv::Point(left_white_x, 376) //links unten
+        */
+
 
 
 
@@ -652,9 +675,9 @@ void mZEDDetection::Update()
       std::vector<cv::Vec4i> right_lines, left_lines, mid_lines;
       std::vector<cv::Point> left_pts, right_pts, mid_pts;
       cv::Vec4d right_line, left_line, mid_line;
-      double left, right;
-      left = 250; //230    // 280
-      right = 340;    // 430
+      //double left, right;
+      //left = 250; //230    // 280
+      //right = 340;    // 430
       cv::Point right_b;
       double right_m;
       cv::Point left_b;
@@ -671,11 +694,11 @@ void mZEDDetection::Update()
       for (size_t i = 0; i < linesred.size(); i++)
       {
         cv::Vec4i l = linesred[i];
-        if (l[2] < left)
+        if (l[2] < red_detection_threshold)  // if (l[2] < left)
         {
           left_lines.push_back(l);
         }
-        else if (right < l[2])
+        else if (red_detection_threshold < l[2]) // else if (right < l[2])
         {
           right_lines.push_back(l);
         }
@@ -688,7 +711,7 @@ void mZEDDetection::Update()
       {
 
         cv::Vec4i l = lines[i];
-        if (l[2] > 135 && right > l[2])
+        if (l[2] > left_white_x && right_white_x > l[2]) // if (l[2] > 170 && 380 > l[2])
         {
           mid_lines.push_back(l);
         }
@@ -834,6 +857,8 @@ void mZEDDetection::Update()
       this->distance_to_mid_out.Publish((mid_ini_x - midpixel));
       this->distance_to_right_out.Publish((right_ini_x - midpixel));
 
+
+      M = mid_ini_x - midpixel;
 
       // Make one image
       //usleep(100000);

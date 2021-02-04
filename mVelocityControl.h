@@ -107,7 +107,7 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  const double commenVelocity = 1.2;
+  const double commenVelocity = 0.8;
 
   bool noLineDet;
 
