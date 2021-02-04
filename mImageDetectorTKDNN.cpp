@@ -84,7 +84,6 @@ mImageDetectorTKDNN::mImageDetectorTKDNN(core::tFrameworkElement *parent, const 
   tModule(parent, name, false) // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
 {
   detNN = &yolo;
-
   int n_classes = 5;
   n_batch = 1;
   detNN->init("/home/agrosy/Documents/tkDNN/build/Unimog_fp32.rt", n_classes, n_batch, conf_thresh);
@@ -133,13 +132,13 @@ void mImageDetectorTKDNN::Update()
       cvtColor(cam_image, cam_image_img, CV_BGR2RGB);
 
       bool stopDetect = false, give_wayDetect = false, conesDetect = false, right_of_wayDetect = false, unimogDetect  = false;
-      double stopSize = 0.0, give_waySize = 0.0, conesSize = 0.0, right_of_waySize = 0.0, unimogSize = 0.0;
+      double stopSize = 0.0, give_waySize = 0.0, conesSize = 0.0, right_of_waySize = 0.0, unimogSize = 0.0, conesX = 334.0, unimogX = 334.0;
 
       batch_dnn_input.clear();
       batch_frame.clear();
 
-      batch_dnn_input.push_back(cam_image_img.clone());
-      batch_frame.push_back(cam_image_img);
+      batch_dnn_input.push_back(cam_image_img);
+      batch_frame.push_back(cam_image);
       detNN->update(batch_dnn_input, n_batch);
 
       detNN->draw(batch_frame);
@@ -152,7 +151,7 @@ void mImageDetectorTKDNN::Update()
         switch (d.cl)
         {
         case 0: //stop
-          stopSize = d.w * d.h;
+          stopSize = std::max(double(d.w * d.h), stopSize);
           if (stopSize > 1800)
           {
             stopDetect = true;
@@ -160,14 +159,14 @@ void mImageDetectorTKDNN::Update()
           }
           break;
         case 1:
-          right_of_waySize = d.w * d.h;
-          if (right_of_waySize > 650)
+          right_of_waySize = std::max(double(d.w * d.h), right_of_waySize);
+          if (right_of_waySize > 1200)
           {
             right_of_wayDetect = true;
           }
           break;
         case 2:
-          give_waySize = d.w * d.h;
+          give_waySize = std::max(double(d.w * d.h), give_waySize);
           if (give_waySize > 1200)
           {
             give_wayDetect = true;
@@ -175,14 +174,16 @@ void mImageDetectorTKDNN::Update()
           }
           break;
         case 3:
-          conesSize = d.w * d.h;
+          conesSize = std::max(double(d.w * d.h), conesSize);
+          conesX = d.x + 0.5 * d.w;
           if (conesSize > 1000)
           {
             conesDetect = true;
           }
           break;
         case 4://unimog
-          unimogSize = d.w * d.h;
+          unimogSize = std::max(double(d.w * d.h), unimogSize);
+          unimogX = d.x + 0.5 * d.w;
           if (unimogSize > 5000)
           {
             unimogDetect = true;
@@ -190,8 +191,6 @@ void mImageDetectorTKDNN::Update()
           break;
         }
       }
-      //std::cout<<"still working"<<std::endl;
-      //cv::imwrite("detection.png", batch_frame[0]);
       // prepare output image
       data_ports::tPortDataPointer<rrlib::coviroa::tImage> img_out = this->out_image.GetUnusedBuffer();
       // copy input image to output image
@@ -216,6 +215,8 @@ void mImageDetectorTKDNN::Update()
       this-> right_of_way_size.Publish(right_of_waySize);
       this-> unimog_size.Publish(unimogSize);
 
+      this-> unimog_left_right.Publish((unimogX - 334.0) / 334.0);
+      this->  cones_left_right.Publish((conesX - 334.0) / 334.0);
 
     }
   }

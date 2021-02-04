@@ -110,6 +110,9 @@ public:
   tOutput<double> right_of_way_size;
   tOutput<double> unimog_size;
 
+  tOutput<double> unimog_left_right;
+  tOutput<double> cones_left_right;
+
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
