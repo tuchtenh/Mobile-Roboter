@@ -68,7 +68,7 @@ protected:
   //enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
   //State state = MID_LINE;
 
-  enum State {  RIGHT_LINE = 0 , LEFT_LINE , STOP };
+  enum State {  RIGHT_LINE = 0, LEFT_LINE , MID_LINE , STOP };
   State state = RIGHT_LINE;
 
   double midValue = 0;
@@ -77,7 +77,7 @@ protected:
 
   double distance = 0;
 
-  const double midValue_min = -195, midValue_max = 0; // Max needs tuned
+  const double midValue_min = -195, midValue_max = 10; // Max needs tuned
   const double rightValue_min = 0, rightValue_max = 470;
   const double leftValue_min = -405, leftValue_max = -120; // Max needs tuned
 
@@ -150,8 +150,11 @@ private:
   OverTakeState overTakeState = LEFT_LINE;
 
   //const double lLane_mid_distance = -155;
-  const double lLane_right_distance = -330;
-  const double lLane_left_distance = 176;
+  //const double lLane_right_distance = -330;
+  //const double lLane_left_distance = 176;
+
+  const double lLane_right_distance = -323;
+  const double lLane_left_distance = 133;
 
   //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
   //OvertakeState overtakeState = SWITCH_LEFT;
@@ -160,10 +163,36 @@ private:
   const double lRightValue_min = 70, lRightValue_max = 490;
   const double lLeftValue_min = -420, lLeftValue_max = -9;
 
+
+
+  const double rightValue_min = 0, rightValue_max = 470;
+  const double leftValue_min = -405, leftValue_max = 0; // Max needs tuned
+
+
+  //coneReaction/////////////////////////////////////////////////////////////
+
+
+  bool coneProcessOn = false;
+
+
+  //coneReaction/////////////////////////////////////////////////////////////
+
+
 public:
   bool takeoverProcessOn = false;
-  void chooseLine();
+  void chooseLineToLeft();
+  void chooseLineToRight();
+
+  std::tuple<int, double, bool> operationToLeftLane(double m, double r, double l);
+  std::tuple<int, double, bool> operationToRightLane(double m, double r, double l);
+
+  std::tuple<int, double, bool> coneReaction(double m, double r, double l);
+  int passConeTimer = 0;
+  int coneReactionTimer = 0;
 };
+
+
+
 
 
 //----------------------------------------------------------------------
@@ -183,9 +212,6 @@ public:
 
 
   tOutput<double> out_curvature;
-  //Ouput for the new light settings
-  tOutput<std::vector<bool>> out_lights;
-
   tOutput<bool> out_noLineDetection;
 
 
@@ -195,9 +221,15 @@ public:
 
 
   tInput<bool> test_bool;
-  //tInput<double> input_velocity_1;
 
-  tOutput<double> block_move_easyDrive;
+  tInput<double> irSensor;
+  tInput<bool> coneDetect;
+  tInput<bool> switchToLeft;
+
+  tInput<bool> goStraight;
+  tInput<bool> yellowSignDetect;
+
+
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -205,19 +237,17 @@ public:
 public:
 
   mEasyDrive(core::tFrameworkElement *parent, const std::string &name = "EasyDrive");
-  //TODO add correct parameters
-  void drive_straight();
-  void drive_curve_1();
-  void drive_curve_2();
-  void drive_intersection();
+
+  void intitialization();
+  void getDetectionAndManual();
 
   void ruleBaseAlgrithm();
   void linearAlgrithm();
   void powerAlgrithm(int distance, double pixelValue);
 
-  void stop();
 
   void expAlgrithm(int distance, double pixelValue);
+  void expStrongCurv(int distance, double pixelValue);
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -236,15 +266,12 @@ protected:
 //----------------------------------------------------------------------
 private:
 
+  enum ReactionState {EASY = 0, SWITCH_TO_LEFT_MANUAL, CONE, TURN_LEFT_GO_STRAIGHT_MANUAL, TURN_LEFT_GO_STRAIGHT_AUTO};
+  ReactionState reactionState = EASY;
+
   bool curve;
-
-  double velocity;
-
   double curvature;
-
   std::vector<bool> lights;
-
-  int test_counter = 0 ;
 
 
   virtual void OnStaticParameterChange() override;
@@ -264,6 +291,8 @@ private:
 
   OverTakeDetMachine overTakeDet;
   OverTakeDetMachine* overTakeDetPtr = &overTakeDet;
+
+
 
 
 

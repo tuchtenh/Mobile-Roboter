@@ -140,7 +140,7 @@ private:
   double gray_treshold = 128;
 
   double M = -70;
-  double m = 0.5;
+  double m = 0.7;
   double a = 0;
 
 };

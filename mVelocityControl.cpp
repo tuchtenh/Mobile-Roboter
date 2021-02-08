@@ -109,6 +109,7 @@ void mVelocityControl::OnParameterChange()
 //----------------------------------------------------------------------
 void mVelocityControl::Update()
 {
+  commenVelocity = in_velocity.Get();
   noLineDet = noLineDetEnable.Get();
   stopDet = stopEnable.Get();
 

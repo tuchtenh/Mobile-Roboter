@@ -85,6 +85,7 @@ public:
   tInput<bool> conesDetEnable;
   tInput<bool> stop_5_secondEnable;
 
+  tInput<double> in_velocity;
   tOutput<double> out_velocity;
 
 
@@ -107,7 +108,7 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  const double commenVelocity = 0.8;
+  double commenVelocity = 0.4;
 
   bool noLineDet;
 
