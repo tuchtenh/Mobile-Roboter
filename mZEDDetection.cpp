@@ -624,15 +624,15 @@ void mZEDDetection::Update()
       cv::Mat mask = cv::Mat::zeros(out.size(), out.type());
 
       /*
-      a = m * (M + 70);
+            a = m * (M + 70);
 
-      if( a<=0 || a >400)
-      {
-        a = 0;
-      }
+            if( a<=0 || a >400)
+            {
+              a = 0;
+            }
 
 
-      std::cout << "a: " << a << std::endl;
+            std::cout << "a: " << a << std::endl;
       */
       a = 0;
 
