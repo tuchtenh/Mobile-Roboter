@@ -161,8 +161,8 @@ private:
   //const double lLane_right_distance = -323;
   //const double lLane_left_distance = 133;
 
-  const double lLane_right_distance = -350;
-  const double lLane_left_distance = 133;
+  const double lLane_right_distance = -454;
+  const double lLane_left_distance = 103;
 
   //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
   //OvertakeState overtakeState = SWITCH_LEFT;
@@ -255,7 +255,10 @@ public:
 
   void ruleBaseAlgrithm();
   void linearAlgrithm();
+
+
   void powerAlgrithm(int distance, double pixelValue);
+  void expSwitchLane(int distance, double pixelValue);
 
 
   void expAlgrithm(int distance, double pixelValue);
