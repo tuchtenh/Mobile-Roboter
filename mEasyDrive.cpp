@@ -1154,24 +1154,26 @@ std::tuple<int, double, bool> OverTakeDetMachine::operationToRightLane(double m,
 std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double r, double l)
 {
 
-  if (coneReactionTimer <= 30)
+  if (coneReactionTimer <= 300)
   {
-    if ((std::get<2>(operationToLeftLane(m, r, l))) == false)
+    std::tuple<int, double, bool> temp = operationToRightLane(m, r, l);
+    if ((std::get<2>(temp)) == false)
     {
       coneReactionTimer++;
     }
 
-    return operationToLeftLane(m, r, l);
+    return temp;
   }
 
-  else if (coneReactionTimer > 30 && coneReactionTimer < 60)
+  else if (coneReactionTimer > 300 && coneReactionTimer < 600)
   {
-    if ((std::get<2>(operationToRightLane(m, r, l))) == false)
+    std::tuple<int, double, bool> temp = operationToRightLane(m, r, l);
+    if ((std::get<2>(temp)) == false)
     {
       coneReactionTimer++;
     }
 
-    return operationToRightLane(m, r, l);
+    return temp;
   }
 
   else
