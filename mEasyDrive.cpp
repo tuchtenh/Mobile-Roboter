@@ -524,7 +524,7 @@ void LineDetMachine::chooseLine()
       noLineDetection = false;
       pixel = midValue;
       distance = rLane_mid_distance;
-      std::cout << "Mid Line Choose.." << std::endl;
+      std::cout << "Mid Line Choose" << std::endl;
     }
     else if (rightValue > rightValue_min && rightValue < rightValue_max)
     {

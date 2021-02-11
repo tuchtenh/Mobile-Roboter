@@ -37,7 +37,7 @@
 #define __projects__finroc_projects_robprak2020_2__mEasyDrive_h__
 
 #include "plugins/structure/tModule.h"
-#include "projects/finroc_projects_robprak2020_2/easyDriveClass.h"
+
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -59,6 +59,147 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+
+
+class LineDetMachine
+{
+private:
+
+
+protected:
+
+  //enum State { MID_LINE = 0 , RIGHT_LINE , LEFT_LINE , STOP };
+  //State state = MID_LINE;
+
+  enum State {  RIGHT_LINE = 0, LEFT_LINE , MID_LINE , STOP };
+  State state = RIGHT_LINE;
+
+  double midValue = 0;
+  double rightValue = 0;
+  double leftValue = 0;
+
+  double distance = 0;
+
+  const double midValue_min = -195, midValue_max = 10; // Max needs tuned
+  const double rightValue_min = 0, rightValue_max = 470;
+  const double leftValue_min = -405, leftValue_max = -120; // Max needs tuned
+
+
+//test/////////////////////////////////////////////////////////////
+  /*
+    const double midValue_min = -200, midValue_max = 200;
+      const double rightValue_min = -500, rightValue_max = 500;
+      const double leftValue_min = -600, leftValue_max = 600;
+
+  */
+//test/////////////////////////////////////////////////////////////
+
+
+  /*//previous
+  const double midValue_min = -130, midValue_max = 0;
+  const double rightValue_min = 0, rightValue_max = 300;
+  const double leftValue_min = -700, leftValue_max = -120;
+  */
+  const double rLane_mid_distance = 70;
+  const double rLane_right_distance = -185;
+  const double rLane_left_distance = 325;
+  /*
+  const double rLane_mid_distance = 67;
+    const double rLane_right_distance = -155;
+    const double rLane_left_distance = -295;
+  */
+
+  double pixel;
+
+  bool noLineDetection = false;
+
+public:
+  void setLineValue(double m, double r, double l);
+
+  virtual void chooseLine();
+
+  double publishDistance();
+  double publishPixel();
+  bool   publishNoDetect();
+  std::tuple<int, double, bool> operation(double m, double r, double l);
+
+
+
+
+
+};
+
+class IntersectDetMachine : public LineDetMachine
+{
+private:
+
+  int mc = 0;
+  int rc = 0;
+  const int interCounter = 50;
+
+  enum IntersectState { MID_LINE = 0, RIGHT_LINE, LEFT_LINE, STOP };
+  IntersectState intersectState = MID_LINE;
+  IntersectState stateMemory = MID_LINE;
+
+
+public:
+  bool interProcessOn = false;
+  void chooseLine();
+};
+
+class OverTakeDetMachine : public LineDetMachine
+{
+private:
+
+  enum OverTakeState { LEFT_LINE = 0, RIGHT_LINE, STOP };
+  OverTakeState overTakeState = LEFT_LINE;
+
+  //const double lLane_mid_distance = -155;
+  //const double lLane_right_distance = -330;
+  //const double lLane_left_distance = 176;
+
+  const double lLane_right_distance = -323;
+  const double lLane_left_distance = 133;
+
+  //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
+  //OvertakeState overtakeState = SWITCH_LEFT;
+
+  //const double lMidValue_min = -200, lMidValue_max = 200;
+  const double lRightValue_min = 70, lRightValue_max = 490;
+  const double lLeftValue_min = -420, lLeftValue_max = -9;
+
+
+
+  const double rightValue_min = 0, rightValue_max = 470;
+  const double leftValue_min = -405, leftValue_max = 0; // Max needs tuned
+
+
+  //coneReaction/////////////////////////////////////////////////////////////
+
+
+
+
+
+  //coneReaction/////////////////////////////////////////////////////////////
+
+
+public:
+  bool takeoverProcessOn = false;
+  void chooseLineToLeft();
+  void chooseLineToRight();
+
+  std::tuple<int, double, bool> operationToLeftLane(double m, double r, double l);
+  std::tuple<int, double, bool> operationToRightLane(double m, double r, double l);
+
+  std::tuple<int, double, bool> coneReaction(double m, double r, double l);
+  int passConeTimer = 0;
+  int coneReactionTimer = 0;
+};
+
+
+
+
+
 
 //----------------------------------------------------------------------
 // Class declaration
