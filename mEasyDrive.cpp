@@ -181,7 +181,8 @@ void mEasyDrive::Update()
     pixel = std::get<1>(lineData);
     noDetect = std::get<2>(lineData);
 
-    expAlgrithm(distance, pixel);
+    expSwitchLane(distance, pixel);
+    //expAlgrithm(distance, pixel);
 
     if (switchToRight.Get() || coneDetect.Get())
     {
@@ -367,6 +368,28 @@ void mEasyDrive::expAlgrithm(int distance, double pixelValue)
 
 }
 
+void mEasyDrive::expSwitchLane(int distance, double pixelValue)
+{
+
+
+  double x = pixelValue + distance;
+  double a_p = 0.005;
+  double a_n = 0.01;
+  double function = 0;
+  if (x >= 0)
+  {
+    function = -3 * (1 - exp(a_n * -x));
+  }
+
+  else
+  {
+    function = 3 * (1 - exp(a_p * x));
+  }
+
+  curvature = function;
+
+}
+
 void mEasyDrive::expStrongCurv(int distance, double pixelValue)
 {
 
@@ -446,6 +469,8 @@ void mEasyDrive::ruleBaseAlgrithm()
 
 void mEasyDrive::linearAlgrithm()
 {
+
+
 
 }
 
