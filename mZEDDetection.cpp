@@ -73,7 +73,6 @@ runtime_construction::tStandardCreateModuleAction<mZEDDetection> cCREATE_ACTION_
 //----------------------------------------------------------------------
 mZEDDetection::mZEDDetection(core::tFrameworkElement *parent, const std::string &name) :
   tModule(parent, name, false) // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
-
 {}
 
 //----------------------------------------------------------------------
@@ -140,23 +139,27 @@ void mZEDDetection::Update()
                 }
               }
             }*/
+
       cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
       cv::Mat hsvchannel[3], saturated;
       cv::split(outred, hsvchannel);
-      hsvchannel[1] = hsvchannel[1] * 5;      // 2
+      cv::Mat binaryred;
+
+      /*
+      hsvchannel[1] = hsvchannel[1] * 4.5;      // 2
       std::vector<cv::Mat> hsv = {hsvchannel[0], hsvchannel[1], hsvchannel[2]};
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
       // TODO cv::imwrite("bildSATURATED.png", outred);
       outred.convertTo(outred, -1, contrast, 0);       // 2
       // TODO cv::imwrite("bildContrast.png", outred);
-      cv::Mat binaryred;
+      //cv::Mat binaryred;
 
       cv::GaussianBlur(outred, outred, cv::Size(5, 5), 0);
 
       //inverted
       cv::bitwise_not(outred, outred);
-      // TODO cv::imwrite("inverted.png", outred);
+      //cv::imwrite("inverted.png", outred);
 
       cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
       // range red
@@ -164,6 +167,50 @@ void mZEDDetection::Update()
       // range with inverted
       cv::inRange(outred, cv::Scalar(85, 120, 230), cv::Scalar(95, 255, 255), binaryred);
       // TODO cv::imwrite("bildMaskeRot.png", binaryred);
+        */
+
+      if(InvertedImage.Get() == 0){
+                hsvchannel[1] = hsvchannel[1] * 4.5;      // 2
+                std::vector<cv::Mat> hsv = {hsvchannel[0], hsvchannel[1], hsvchannel[2]};
+                cv::merge(hsv, saturated);
+                cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
+                // TODO cv::imwrite("bildSATURATED.png", outred);
+                outred.convertTo(outred, -1, contrast, 0);       // 2
+                // TODO cv::imwrite("bildContrast.png", outred);
+                //cv::Mat binaryred;
+
+                cv::GaussianBlur(outred, outred, cv::Size(5, 5), 0);
+
+                //inverted
+                cv::bitwise_not(outred, outred);
+                //cv::imwrite("inverted.png", outred);
+
+                cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
+                // range red
+                // cv::inRange(outred, cv::Scalar(1, 200, 200), cv::Scalar(15, 255, 255), binaryred);
+                // range with inverted
+                cv::inRange(outred, cv::Scalar(85, 120, 230), cv::Scalar(95, 255, 255), binaryred);
+                // TODO cv::imwrite("bildMaskeRot.png", binaryred);
+      } else {
+                hsvchannel[1] = hsvchannel[1] * 5;      // 2
+                std::vector<cv::Mat> hsv = {hsvchannel[0], hsvchannel[1], hsvchannel[2]};
+                cv::merge(hsv, saturated);
+                cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
+                // TODO cv::imwrite("bildSATURATED.png", outred);
+                outred.convertTo(outred, -1, contrast, 0);       // 2
+                // TODO cv::imwrite("bildContrast.png", outred);
+                //cv::Mat binaryred;
+
+                cv::GaussianBlur(outred, outred, cv::Size(5, 5), 0);
+
+                //cv::imwrite("inverted.png", outred);
+
+                cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
+                // range red
+                cv::inRange(outred, cv::Scalar(1, 200, 200), cv::Scalar(15, 255, 255), binaryred);
+                // TODO cv::imwrite("bildMaskeRot.png", binaryred);
+      }
+
       cv::cvtColor(outred, outred, cv::COLOR_HSV2BGR);
 
       cv::cvtColor(outred, outred, cv::COLOR_BGR2GRAY);
@@ -323,7 +370,7 @@ void mZEDDetection::Update()
       }
 
 
-      // TODO cv::imwrite("bildHOUGHLINES.png", img);
+       // TODO cv::imwrite("bildHOUGHLINES.png", img);
 
       //std::cout << lines.size() << " mid lines" << std::endl;
       //std::cout << linesred.size() << " side lines" << std::endl;
@@ -471,7 +518,7 @@ void mZEDDetection::Update()
       //usleep(100000);
 
 
-      // TODOthis->camera_out.Publish(img_out);
+      //this->camera_out.Publish(img_out);
 
     }
   }

@@ -88,7 +88,8 @@ public:
   tOutput<double> angle_to_left_out;
   tOutput<double> angle_to_mid_out;
   tOutput<double> angle_to_right_out;
-
+  
+  tInput<bool> InvertedImage;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
