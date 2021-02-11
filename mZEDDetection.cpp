@@ -552,25 +552,6 @@ void mZEDDetection::Update()
       cv::Mat outred = rrlib::coviroa::AccessImageAsMat(*img_out);
       // apply gaussian blur
       // img.convertTo(out,-1,1,50);
-      if (old_left > 500 || old_right > 500 || old_left < -500 || old_right < -500)
-      {
-        if (contrast_change)
-        {
-          contrast -= 0.25;
-          if (contrast > 2)
-          {
-            contrast_change = false;
-          }
-        }
-        if (!contrast_change)
-        {
-          contrast += 0.25;
-          if (contrast < 0.5)
-          {
-            contrast_change = true;
-          }
-        }
-      }
 
       cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
       cv::Mat hsvchannel[3], saturated;
@@ -580,7 +561,7 @@ void mZEDDetection::Update()
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
       cv::imwrite("bildSATURATED.png", outred);
-      outred.convertTo(outred, contrast, 2, 0);       // 2
+      outred.convertTo(outred, -1, 2, 0);       // 2
       cv::imwrite("bildContrast.png", outred);
       cv::Mat binaryred;
 
@@ -849,49 +830,43 @@ void mZEDDetection::Update()
 
       cv::imwrite("bildFittedLines.png", img);
 
-
       double midpixel = img.cols / 2;
-      old_left = (left_ini_x - midpixel);
-      old_mid = (mid_ini_x - midpixel);
-      old_right = (right_ini_x - midpixel);
 
-      if (queueLeft.size() < 999 && old_left != std::numeric_limits<double>::infinity())
+      if (queueLeft.size() < 999 && left_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueLeft.push(old_left);
+        queueLeft.push(left_ini_x - midpixel);
       }
-      else if (old_left != std::numeric_limits<double>::infinity())
+      else if (left_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueLeft.push(old_left);
+        queueLeft.push(left_ini_x - midpixel);
         this->angle_to_left_out.Publish(std::acos((queueLeft.back() - queueLeft.front()) / (std::sqrt(std::pow(queueLeft.back() - queueLeft.front(), 2) + 100))));
         queueLeft.pop();
       }
 
-      if (queueMid.size() < 999 && old_mid != std::numeric_limits<double>::infinity())
+      if (queueMid.size() < 999 && mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueMid.push(old_mid);
+        queueMid.push(mid_ini_x - midpixel);
       }
-      else if (old_mid != std::numeric_limits<double>::infinity())
+      else if (mid_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueMid.push(old_mid);
+        queueMid.push(mid_ini_x - midpixel);
         this->angle_to_mid_out.Publish(std::acos((queueMid.back() - queueMid.front()) / (std::sqrt(std::pow(queueMid.back() - queueMid.front(), 2) + 100))));
         queueMid.pop();
       }
-      if (queueRight.size() < 999 && old_right != std::numeric_limits<double>::infinity())
+      if (queueRight.size() < 999 && right_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueRight.push(old_right);
+        queueRight.push(right_ini_x - midpixel);
       }
-      else if (old_right != std::numeric_limits<double>::infinity())
+      else if (right_ini_x - midpixel != std::numeric_limits<double>::infinity())
       {
-        queueRight.push(old_right);
+        queueRight.push(right_ini_x - midpixel);
         this->angle_to_right_out.Publish(std::acos((queueRight.back() - queueRight.front()) / (std::sqrt(std::pow(queueRight.back() - queueRight.front(), 2) + 100))));
         queueRight.pop();
       }
 
-
-
-      this->distance_to_left_out.Publish(old_left);
-      this->distance_to_mid_out.Publish(old_mid);
-      this->distance_to_right_out.Publish(old_right);
+      this->distance_to_left_out.Publish((left_ini_x - midpixel));
+      this->distance_to_mid_out.Publish((mid_ini_x - midpixel));
+      this->distance_to_right_out.Publish((right_ini_x - midpixel));
 
 
       M = mid_ini_x - midpixel;

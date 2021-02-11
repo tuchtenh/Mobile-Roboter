@@ -138,15 +138,10 @@ private:
   double red_detection_threshold = 350;
 
   double gray_treshold = 128;
-  double contrast =  1;
 
   double M = -70;
   double m = 0.95;
   double a = 0;
-  double old_left = 0;
-  double old_right = 0;
-  double old_mid = 0 ;
-  bool contrast_change = true;
 
 };
 
