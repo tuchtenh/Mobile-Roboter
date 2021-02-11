@@ -158,7 +158,10 @@ private:
   //const double lLane_right_distance = -330;
   //const double lLane_left_distance = 176;
 
-  const double lLane_right_distance = -323;
+  //const double lLane_right_distance = -323;
+  //const double lLane_left_distance = 133;
+
+  const double lLane_right_distance = -350;
   const double lLane_left_distance = 133;
 
   //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
@@ -187,6 +190,7 @@ public:
   bool takeoverProcessOn = false;
   void chooseLineToLeft();
   void chooseLineToRight();
+
 
   std::tuple<int, double, bool> operationToLeftLane(double m, double r, double l);
   std::tuple<int, double, bool> operationToRightLane(double m, double r, double l);

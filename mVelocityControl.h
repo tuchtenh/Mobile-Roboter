@@ -84,9 +84,14 @@ public:
   tInput<bool> stopEnable;
   tInput<bool> conesDetEnable;
   tInput<bool> stop_5_secondEnable;
+  tInput<bool> unimogDet;
+  tInput<bool> rightOfWayEnable;
+  tInput<double> frontSensor;
+  tInput<bool> slowMode;
 
   tInput<double> in_velocity;
   tOutput<double> out_velocity;
+  tOutput<bool> out_turn;
 
 
 
@@ -108,7 +113,8 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  double commenVelocity = 0.4;
+  double minVelocity = 0.3;
+  double maxVelocity = 0.8;
 
   bool noLineDet;
 
@@ -116,14 +122,37 @@ private:
   bool stopDet;
   bool stopProcessOn = false;
 
+  bool rightOfWayOn = false;
+  bool turn = false;
+
+  bool bridgeProcessOn = false;
+
   enum StopSignState {INIT, STOP, DRIVE};
   StopSignState stopSignState = INIT;
-  double reactToStopSign(bool detectStop);
   int sc = 0;
   int dc = 0;
-
   const int scValue = 50;
   const int dcValue = 30;
+
+  enum RightOfWaySignState {START, APPROACH, CONTINUE};
+  RightOfWaySignState ROWState = START;
+  int ac = 0; //approach Counter
+  int ic = 0; //ignore Counter to ignore the Sign;
+  const int acValue = 250;
+  const int icValue = 200;
+
+  enum BridgeState {UP, DOWN};
+  BridgeState bridgeState = UP;
+  int cc = 0; //climb counter
+  int desc = 0; //descend counter
+  const int ccValue = 50;
+  const int descValue = 200;
+
+  double reactToStopSign(bool detectStop);
+  double reactToRightOfWaySign();
+  double reactToBridge();
+
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

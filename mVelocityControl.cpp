@@ -61,7 +61,8 @@ namespace finroc_projects_robprak2020_2
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-runtime_construction::tStandardCreateModuleAction<mVelocityControl> cCREATE_ACTION_FOR_M_VELOCITYCONTROL("VelocityControl");
+runtime_construction::tStandardCreateModuleAction<mVelocityControl> cCREATE_ACTION_FOR_M_VELOCITYCONTROL(
+  "VelocityControl");
 
 //----------------------------------------------------------------------
 // Implementation
@@ -70,12 +71,11 @@ runtime_construction::tStandardCreateModuleAction<mVelocityControl> cCREATE_ACTI
 //----------------------------------------------------------------------
 // mVelocityControl constructor
 //----------------------------------------------------------------------
-mVelocityControl::mVelocityControl(core::tFrameworkElement *parent, const std::string &name) :
-  tModule(parent, name, false)//, // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
-  //If you have some member variables, please initialize them here. Especially built-in types (like pointers!). Delete this line otherwise!
+mVelocityControl::mVelocityControl(core::tFrameworkElement *parent,
+                                   const std::string &name) :
+  tModule(parent, name, false) //, // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
+//If you have some member variables, please initialize them here. Especially built-in types (like pointers!). Delete this line otherwise!
 {
-
-
 
 }
 
@@ -83,7 +83,8 @@ mVelocityControl::mVelocityControl(core::tFrameworkElement *parent, const std::s
 // mVelocityControl destructor
 //----------------------------------------------------------------------
 mVelocityControl::~mVelocityControl()
-{}
+{
+}
 
 //----------------------------------------------------------------------
 // mVelocityControl OnStaticParameterChange
@@ -91,9 +92,9 @@ mVelocityControl::~mVelocityControl()
 void mVelocityControl::OnStaticParameterChange()
 {
   /*if (this->static_parameter_1.HasChanged())
-  {
-    //As this static parameter has changed, do something with its value!
-  }*/
+   {
+   //As this static parameter has changed, do something with its value!
+   }*/
 }
 
 //----------------------------------------------------------------------
@@ -109,7 +110,10 @@ void mVelocityControl::OnParameterChange()
 //----------------------------------------------------------------------
 void mVelocityControl::Update()
 {
-  commenVelocity = in_velocity.Get();
+  if (in_velocity.HasChanged())
+  {
+    maxVelocity = in_velocity.Get();
+  }
   noLineDet = noLineDetEnable.Get();
   stopDet = stopEnable.Get();
 
@@ -117,78 +121,74 @@ void mVelocityControl::Update()
   {
     out_velocity.Publish(0);
   }
+  else if (unimogDet.Get())
+  {
+    out_velocity.Publish(0);
+  }
+  else if (stopDet || stopProcessOn)
+  {
+    out_velocity.Publish(reactToStopSign(stopDet));
+  }
+  else if (rightOfWayEnable.Get() || rightOfWayOn)
+  {
+    out_velocity.Publish(reactToRightOfWaySign());
+  }
   else
   {
-    if (stopDet)
+    if (slowMode.Get())
     {
-      out_velocity.Publish(reactToStopSign(stopDet));
+      out_velocity.Publish(minVelocity);
     }
-
     else
     {
-      if (stopProcessOn)
-      {
-        out_velocity.Publish(reactToStopSign(stopDet));
-      }
-
-      else
-      {
-        out_velocity.Publish(commenVelocity);
-      }
+      out_velocity.Publish(maxVelocity);
     }
-
-
-
-
   }
-
-  //out_velocity.Publish(reactToStopSign(stop));
-
-
-
-  /*
-    if (stop == true || stop_lock==true && drive_counter == 100)
-    {
-
-      out_velocity.Publish(0);
-      stop_counter++;
-
-      if(stop_counter == 50)
-      {
-        stop_lock == false;
-        drive_counter = 0;
-      }
-      else
-      {
-        stop_lock == true;
-        stop_counter = 0;
-      }
-    } else if (noLineDet == true)
-    {
-      out_velocity.Publish(0);
-    }
-
-    else
-    {
-    if (drive_counter < 100){
-      drive_counter++;
-    }
-      out_velocity.Publish(0.8);
-    }
-    */
-
-
-
-  /*if (this->InputChanged())
-  {
-    At least one of your input ports has changed. Do something useful with its data.
-    However, using the .HasChanged() method on each port you can check in more detail.
-  }
-
-  Do something each cycle independent from changing ports.
-
-  this->out_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.*/
+  out_turn.Publish(turn);
 }
+
+//out_velocity.Publish(reactToStopSign(stop));
+
+/*
+ if (stop == true || stop_lock==true && drive_counter == 100)
+ {
+
+ out_velocity.Publish(0);
+ stop_counter++;
+
+ if(stop_counter == 50)
+ {
+ stop_lock == false;
+ drive_counter = 0;
+ }
+ else
+ {
+ stop_lock == true;
+ stop_counter = 0;
+ }
+ } else if (noLineDet == true)
+ {
+ out_velocity.Publish(0);
+ }
+
+ else
+ {
+ if (drive_counter < 100){
+ drive_counter++;
+ }
+ out_velocity.Publish(0.8);
+ }
+ */
+
+/*if (this->InputChanged())
+ {
+ At least one of your input ports has changed. Do something useful with its data.
+ However, using the .HasChanged() method on each port you can check in more detail.
+ }
+
+ Do something each cycle independent from changing ports.
+
+ this->out_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.*/
 
 double mVelocityControl::reactToStopSign(bool detectStop)
 {
@@ -197,11 +197,11 @@ double mVelocityControl::reactToStopSign(bool detectStop)
   switch (stopSignState)
   {
   case INIT:
-    v = commenVelocity;
+    v = maxVelocity;
     sc = 0;
     dc = 0;
     stopProcessOn = true;
-    std::cout << "STOP sign Prcess On" << std::endl;
+    std::cout << "STOP sign Process On" << std::endl;
 
     stopSignState = STOP;
 
@@ -227,7 +227,7 @@ double mVelocityControl::reactToStopSign(bool detectStop)
 
   case DRIVE:
     dc++;
-    v = commenVelocity;
+    v = maxVelocity;
     if (dc <= dcValue)
     {
       stopSignState = DRIVE;
@@ -236,7 +236,7 @@ double mVelocityControl::reactToStopSign(bool detectStop)
     {
       stopSignState = INIT;
       stopProcessOn = false;
-      std::cout << "STOP sign Prcess Off" << std::endl;
+      std::cout << "STOP sign Process Off" << std::endl;
     }
     else
     {
@@ -248,9 +248,106 @@ double mVelocityControl::reactToStopSign(bool detectStop)
     std::cout << "STOP sign reaction wrong" << std::endl;
     break;
 
-
   }
 
+  return v;
+}
+
+double mVelocityControl::reactToRightOfWaySign()
+{
+  double v = 0;
+  switch (ROWState)
+  {
+  case START:
+    v = maxVelocity;
+    ac = 0;
+    ic = 0;
+    rightOfWayOn = true;
+    std::cout << "Right of Way sign APPROACH On" << std::endl;
+
+    ROWState = APPROACH;
+
+    break;
+
+  case APPROACH:
+    v = maxVelocity - ((maxVelocity - minVelocity) * ac * 0.004);
+    ac++;
+
+    if (ac <= acValue)
+    {
+      ROWState = APPROACH;
+    }
+    else if (ac > acValue)
+    {
+      ROWState = CONTINUE;
+    }
+    else
+    {
+      std::cout << "Right of Way sign APPROACH state bug" << std::endl;
+    }
+    break;
+
+  case CONTINUE:
+    ic++;
+    v = maxVelocity;
+    if (ic <= icValue)
+    {
+      ROWState = CONTINUE;
+      turn = true;
+    }
+    else if (ic > icValue)
+    {
+      ROWState = START;
+      rightOfWayOn = false;
+      turn = false;
+      std::cout << "Right of Way sign APPROACH Off" << std::endl;
+    }
+    else
+    {
+      std::cout << "Right of Way sign CONTINUE state bug" << std::endl;
+    }
+    break;
+
+  default:
+    std::cout << "Right of Way sign reaction wrong" << std::endl;
+    break;
+
+  }
+  return v;
+}
+
+double mVelocityControl::reactToBridge()
+{
+  double v = 0;
+  switch (bridgeState)
+  {
+  case UP:
+    v = minVelocity + cc * 0.02 * maxVelocity;
+    cc++;
+    if (cc <= ccValue)
+    {
+      bridgeProcessOn = true;
+    }
+    else if (cc > ccValue)
+    {
+      bridgeState = DOWN;
+    }
+    break;
+  case DOWN:
+    v = 0.1;
+    desc++;
+    if (desc > descValue)
+    {
+      bridgeState = UP;
+      bridgeProcessOn = false;
+    }
+    break;
+  default:
+    v = 0;
+    std::cout << "Climbing bridge reaction wrong" << std::endl;
+    break;
+
+  }
   return v;
 }
 
