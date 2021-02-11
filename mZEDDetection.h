@@ -145,7 +145,7 @@ private:
   double old_right;
   double old_mid;
   double old_left;
-  double contrast = 1.1;
+  double contrast = 1;
   bool contrast_change = true;
 
 };

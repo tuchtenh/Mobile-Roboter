@@ -1,4 +1,4 @@
-//
+// 11 Feb 2021
 // You received this file as part of Finroc
 // A framework for intelligent robot control
 //
@@ -147,17 +147,23 @@ void mZEDDetection::Update()
       std::vector<cv::Mat> hsv = {hsvchannel[0], hsvchannel[1], hsvchannel[2]};
       cv::merge(hsv, saturated);
       cv::cvtColor(saturated, outred, cv::COLOR_HSV2BGR);
-      cv::imwrite("bildSATURATED.png", outred);
+      // TODO cv::imwrite("bildSATURATED.png", outred);
       outred.convertTo(outred, -1, contrast, 0);       // 2
-      cv::imwrite("bildContrast.png", outred);
+      // TODO cv::imwrite("bildContrast.png", outred);
       cv::Mat binaryred;
 
       cv::GaussianBlur(outred, outred, cv::Size(5, 5), 0);
 
+      //inverted
+      cv::bitwise_not(outred, outred);
+      // TODO cv::imwrite("inverted.png", outred);
 
       cv::cvtColor(outred, outred, cv::COLOR_BGR2HSV);
-      cv::inRange(outred, cv::Scalar(1, 200, 200), cv::Scalar(15, 255, 255), binaryred);
-      //cv::imwrite("bildMaskeRot.png", binaryred);
+      // range red
+      // cv::inRange(outred, cv::Scalar(1, 200, 200), cv::Scalar(15, 255, 255), binaryred);
+      // range with inverted
+      cv::inRange(outred, cv::Scalar(85, 120, 230), cv::Scalar(95, 255, 255), binaryred);
+      // TODO cv::imwrite("bildMaskeRot.png", binaryred);
       cv::cvtColor(outred, outred, cv::COLOR_HSV2BGR);
 
       cv::cvtColor(outred, outred, cv::COLOR_BGR2GRAY);
@@ -191,7 +197,7 @@ void mZEDDetection::Update()
       // Multiply the edges image and the mask to get the output
       cv::bitwise_and(binaryred, maskred, outred);
 
-      cv::imwrite("bildMASKred.png", outred);
+      // TODO cv::imwrite("bildMASKred.png", outred);
 
       std::vector<cv::Vec4i> linesred; // will hold the results of the detection
       cv::HoughLinesP(outred, linesred, 1, CV_PI / 180, 1, 0, 0); // runs the actual detection       //(1) 20 instead of 50     @@@@@@@@@@@@@@@@@@@@@
@@ -205,7 +211,7 @@ void mZEDDetection::Update()
       //cv::imwrite("bildGRAY.png", out);
 
       cv::threshold(out, out, gray_treshold, 255, cv::THRESH_BINARY); // 128
-      cv::imwrite("bildBINRAY.png", out);
+      // TODO cv::imwrite("bildBINRAY.png", out);
 
       //masking the image white
       cv::Mat mask = cv::Mat::zeros(out.size(), out.type());
@@ -260,7 +266,7 @@ void mZEDDetection::Update()
       // Multiply the edges image and the mask to get the output
       cv::bitwise_and(out, mask, out);
 
-      cv::imwrite("bildMASK.png", out);
+      //TODO cv::imwrite("bildMASK.png", out);
 
       // calculating HoughLines
       std::vector<cv::Vec4i> lines; // will hold the results of the detection
@@ -300,7 +306,7 @@ void mZEDDetection::Update()
         {
           right_lines.push_back(l);
         }
-        cv::line(img, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 0, 255, 255), 5, CV_AA);
+        cv::line(img, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 255, 255, 255), 5, CV_AA);
       }
 
 
@@ -317,7 +323,7 @@ void mZEDDetection::Update()
       }
 
 
-      cv::imwrite("bildHOUGHLINES.png", img);
+      // TODO cv::imwrite("bildHOUGHLINES.png", img);
 
       //std::cout << lines.size() << " mid lines" << std::endl;
       //std::cout << linesred.size() << " side lines" << std::endl;
@@ -465,7 +471,7 @@ void mZEDDetection::Update()
       //usleep(100000);
 
 
-      this->camera_out.Publish(img_out);
+      // TODOthis->camera_out.Publish(img_out);
 
     }
   }
