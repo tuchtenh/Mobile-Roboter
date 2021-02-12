@@ -85,12 +85,15 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //new mZEDDetection(this);
 
   mVelocityControl* velocity_control = new mVelocityControl(this);
-  velocity_control->noLineDetEnable.ConnectTo(easy_drive->out_noLineDetection);
+  easy_drive->out_slowMtion.ConnectTo(velocity_control->slowMode);
+  easy_drive->out_noLineDetection.ConnectTo(velocity_control->noLineDetEnable);
+
   /*
     mImageDetectorTKDNN*  imageDetector = new mImageDetectorTKDNN(this);
     imageDetector->stop.ConnectTo(velocity_control->stopEnable);
+    imageDetector->cones.ConnectTo(easy_drive->coneDetect);
+     imageDetector->right_of_way.ConnectTo(easy_drive->yellowSignDetect);
   */
-
 
 
 

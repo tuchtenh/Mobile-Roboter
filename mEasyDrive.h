@@ -131,20 +131,31 @@ public:
 
 class IntersectDetMachine : public LineDetMachine
 {
-private:
+public:
 
-  int mc = 0;
-  int rc = 0;
-  const int interCounter = 50;
+
+
+  bool interProcessOn = false;
+  void chooseLine();
+
+  void setIntersectLeft();
+  void setIntersectStraight();
+
+private:
 
   enum IntersectState { MID_LINE = 0, RIGHT_LINE, LEFT_LINE, STOP };
   IntersectState intersectState = MID_LINE;
   IntersectState stateMemory = MID_LINE;
 
+  int mc = 0;
+  int rc = 0;
+  const int interCounter = 350;
 
-public:
-  bool interProcessOn = false;
-  void chooseLine();
+
+
+
+
+
 };
 
 class OverTakeDetMachine : public LineDetMachine
@@ -161,13 +172,16 @@ private:
   //const double lLane_right_distance = -323;
   //const double lLane_left_distance = 133;
 
-  const double lLane_right_distance = -454;
-  const double lLane_left_distance = 103;
+  //const double lLane_right_extreme_distance = -454;
+  //const double lLane_left_extreme_distance = 103;
 
-  //enum OvertakeState {SWITCH_LEFT, KEEP_DRIVING, STOP};
-  //OvertakeState overtakeState = SWITCH_LEFT;
+  const double lLane_right_distance = -305;
+  const double lLane_left_distance = 205;
 
-  //const double lMidValue_min = -200, lMidValue_max = 200;
+  const double lLane_right_extreme_distance = -400;
+  const double lLane_left_extreme_distance = 100;
+
+
   const double lRightValue_min = 70, lRightValue_max = 490;
   const double lLeftValue_min = -420, lLeftValue_max = -9;
 
@@ -189,10 +203,15 @@ private:
 public:
   bool takeoverProcessOn = false;
   void chooseLineToLeft();
+  void chooseLineToLeftExtreme();
+
   void chooseLineToRight();
 
 
   std::tuple<int, double, bool> operationToLeftLane(double m, double r, double l);
+  std::tuple<int, double, bool> operationToLeftLaneExtreme(double m, double r, double l);
+
+
   std::tuple<int, double, bool> operationToRightLane(double m, double r, double l);
 
   std::tuple<int, double, bool> coneReaction(double m, double r, double l);
@@ -223,6 +242,7 @@ public:
 
   tOutput<double> out_curvature;
   tOutput<bool> out_noLineDetection;
+  tOutput<bool> out_slowMtion;
 
 
   tInput<double> input_curvature_left;
@@ -281,9 +301,10 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  enum ReactionState {EASY = 0, CONE, SWITCH_TO_LEFT_MANUAL, TURN_LEFT_GO_STRAIGHT_MANUAL, TURN_LEFT_GO_STRAIGHT_AUTO};
+  enum ReactionState {EASY = 0, CONE, SWITCH_TO_LEFT_MANUAL, TURN_LEFT_GO_STRAIGHT_AUTO, TURN_LEFT_GO_STRAIGHT_MANUAL_LEFT, TURN_LEFT_GO_STRAIGHT_MANUAL_STRAIGHT};
   ReactionState reactionState = EASY;
 
+  double changeSmoothCounter = 0;
 
   double curvature;
   std::vector<bool> lights;
@@ -307,6 +328,7 @@ private:
 
 
   char straightOrLeft_int_temp;
+  bool slowMotion_bool_temp;
 
 
 

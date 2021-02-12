@@ -153,6 +153,20 @@ void mEasyDrive::Update()
       std::cout << "Intersection_Auto" << std::endl;
     }
 
+    if (yellowSignDetect.Get() == true && straightOrLeft_int_temp == 1)
+    {
+      reactionState = TURN_LEFT_GO_STRAIGHT_MANUAL_LEFT;
+      intersectDetPtr->interProcessOn = true;
+      std::cout << "Intersection_Manual_Left" << std::endl;
+    }
+
+    if (yellowSignDetect.Get() == true && straightOrLeft_int_temp == 2)
+    {
+      reactionState = TURN_LEFT_GO_STRAIGHT_MANUAL_STRAIGHT;
+      intersectDetPtr->interProcessOn = true;
+      std::cout << "Intersection_Manual_Straight" << std::endl;
+    }
+
     break;
 
   case CONE:
@@ -165,6 +179,8 @@ void mEasyDrive::Update()
 
     expAlgrithm(distance, pixel);
 
+    slowMotion_bool_temp = true;
+
     if (overTakeDetPtr->takeoverProcessOn == false)
     {
       reactionState = EASY;
@@ -175,17 +191,32 @@ void mEasyDrive::Update()
 
   case SWITCH_TO_LEFT_MANUAL:
 
-    lineData = overTakeDetPtr->operationToLeftLane(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    changeSmoothCounter++;
+
+    if (changeSmoothCounter < 500)
+    {
+      slowMotion_bool_temp = true;
+      lineData = overTakeDetPtr->operationToLeftLane(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
+    }
+
+    else
+    {
+      lineData = overTakeDetPtr->operationToLeftLaneExtreme(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+      changeSmoothCounter = 1000;
+    }
+
 
     distance = std::get<0>(lineData);
     pixel = std::get<1>(lineData);
     noDetect = std::get<2>(lineData);
 
-    expSwitchLane(distance, pixel);
-    //expAlgrithm(distance, pixel);
+    //expSwitchLane(distance, pixel);
+    expAlgrithm(distance, pixel);
 
     if (switchToRight.Get() || coneDetect.Get())
     {
+      changeSmoothCounter = 0;
       reactionState = EASY;
       std::cout << "Switch_To_Right" << std::endl;
     }
@@ -194,6 +225,8 @@ void mEasyDrive::Update()
     break;
 
   case TURN_LEFT_GO_STRAIGHT_AUTO:
+
+    slowMotion_bool_temp = true;
 
     lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
 
@@ -206,14 +239,51 @@ void mEasyDrive::Update()
     if (intersectDetPtr->interProcessOn == false)
     {
       reactionState = EASY;
-      std::cout << "Intersection_Off" << std::endl;
+      std::cout << "Intersection_Auto_Off" << std::endl;
 
     }
 
     break;
 
-  case TURN_LEFT_GO_STRAIGHT_MANUAL:
+  case TURN_LEFT_GO_STRAIGHT_MANUAL_LEFT:
 
+    slowMotion_bool_temp = true;
+
+    intersectDetPtr->setIntersectLeft();
+    lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
+    distance = std::get<0>(lineData);
+    pixel = std::get<1>(lineData);
+    noDetect = std::get<2>(lineData);
+
+    expStrongCurv(distance, pixel);
+
+    if (intersectDetPtr->interProcessOn == false)
+    {
+      reactionState = EASY;
+      std::cout << "Intersection_Manual_Left_Off" << std::endl;
+    }
+
+    break;
+
+  case TURN_LEFT_GO_STRAIGHT_MANUAL_STRAIGHT:
+
+    slowMotion_bool_temp = true;
+
+    intersectDetPtr->setIntersectStraight();
+    lineData = intersectDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
+    distance = std::get<0>(lineData);
+    pixel = std::get<1>(lineData);
+    noDetect = std::get<2>(lineData);
+
+    expStrongCurv(distance, pixel);
+
+    if (intersectDetPtr->interProcessOn == false)
+    {
+      reactionState = EASY;
+      std::cout << "Intersection_Manual_Straight_Off" << std::endl;
+    }
 
     break;
 
@@ -322,6 +392,8 @@ void mEasyDrive::Update()
 
 
 
+
+  this->out_slowMtion.Publish(slowMotion_bool_temp);
   this->out_curvature.Publish(curvature);
   this->out_noLineDetection.Publish(noDetect);
 
@@ -329,7 +401,9 @@ void mEasyDrive::Update()
 }
 
 void mEasyDrive::intitialization()
-{}
+{
+  slowMotion_bool_temp = false;
+}
 
 void mEasyDrive::getDetectionAndManual()
 {
@@ -543,15 +617,8 @@ void LineDetMachine::chooseLine()
     break;
 
   case MID_LINE:
-    if (midValue > midValue_min && midValue < midValue_max)
-    {
-      state = MID_LINE;
-      noLineDetection = false;
-      pixel = midValue;
-      distance = rLane_mid_distance;
-      std::cout << "Mid Line Choose" << std::endl;
-    }
-    else if (rightValue > rightValue_min && rightValue < rightValue_max)
+
+    if (rightValue > rightValue_min && rightValue < rightValue_max)
     {
       state = RIGHT_LINE;
     }
@@ -560,6 +627,16 @@ void LineDetMachine::chooseLine()
     {
       state = LEFT_LINE;
     }
+
+    else if (midValue > midValue_min && midValue < midValue_max)
+    {
+      state = MID_LINE;
+      noLineDetection = false;
+      pixel = midValue;
+      distance = rLane_mid_distance;
+      std::cout << "Mid Line Choose..." << std::endl;
+    }
+
     else
     {
       state = STOP;
@@ -715,6 +792,18 @@ std::tuple<int, double, bool> LineDetMachine::operation(double m, double r, doub
   chooseLine();
 
   return std::make_tuple(publishDistance(), publishPixel(), publishNoDetect());
+}
+
+void IntersectDetMachine::setIntersectLeft()
+{
+  intersectState = MID_LINE;
+
+}
+
+void IntersectDetMachine::setIntersectStraight()
+{
+  intersectState = RIGHT_LINE;
+
 }
 
 
@@ -995,98 +1084,81 @@ void OverTakeDetMachine::chooseLineToLeft()
     std::cout << "OverTakeDetMachineToLeft screw up" << std::endl;
     break;
   }
-  /*
-  switch (state)
+
+}
+
+
+void OverTakeDetMachine::chooseLineToLeftExtreme()
+{
+  switch (overTakeState)
   {
-  case MID_LINE:
-    if (midValue > lMidValue_min && midValue < lMidValue_max)
+  case LEFT_LINE:
+
+    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
     {
-      state = MID_LINE;
-      //x = midValue;
+      overTakeState = LEFT_LINE;
       noLineDetection = false;
-      //offset = 67;
-
-      pixel = midValue;
-      distance = lLane_mid_distance;
-
-      std::cout << "Middle Line Choose for OverTake: )))" << std::endl;
+      pixel = leftValue;
+      distance = lLane_left_extreme_distance;
+      std::cout << "Left Line Choose for OverTakeToLeft Extreme" << std::endl;
     }
     else
     {
-      state = RIGHT_LINE;
+      overTakeState = RIGHT_LINE;
     }
+
     break;
 
   case RIGHT_LINE:
+
     if (rightValue > lRightValue_min && rightValue < lRightValue_max)
     {
-      state = RIGHT_LINE;
+      overTakeState = RIGHT_LINE;
       noLineDetection = false;
       pixel = rightValue;
-      distance = lLane_right_distance;
-      std::cout << "Right Line Choose for OverTake" << std::endl;
-    }
-    else if (midValue > lMidValue_min && midValue < lMidValue_max)
-    {
-      state = MID_LINE;
-    }
-    else
-    {
-      state = LEFT_LINE;
-    }
-    break;
-
-  case LEFT_LINE:
-    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
-    {
-      state = LEFT_LINE;
-      noLineDetection = false;
-      pixel = leftValue;
-      distance = lLane_left_distance;
-      std::cout << "Left Line Choose for OverTake" << std::endl;
-    }
-    else if (midValue > lMidValue_min && midValue < lMidValue_max)
-    {
-      state = RIGHT_LINE;
-    }
-    else
-    {
-      state = STOP;
-    }
-    break;
-
-  case STOP:
-    distance = 0;
-    pixel = 0;
-    noLineDetection = true;
-    std::cout << noLineDetection << std::endl;
-    std::cout << "stop,,, for Intersect" << std::endl;
-    if (midValue > lMidValue_min && midValue < lMidValue_max)
-    {
-      state = MID_LINE;
-    }
-    else if (rightValue > lRightValue_min && rightValue < lRightValue_max)
-    {
-      state = RIGHT_LINE;
+      distance = lLane_right_extreme_distance;
+      std::cout << "Right Line Choose for OverTakeToLeft Extreme" << std::endl;
     }
     else if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
     {
-      state = LEFT_LINE;
+      overTakeState = LEFT_LINE;
+    }
+    else
+    {
+      overTakeState = STOP;
+    }
+    break;
+
+
+
+  case STOP:
+
+    distance = 0;
+    pixel = 0;
+    noLineDetection = true;
+    std::cout << "stop, for OverTakeToLeft Extreme" << std::endl;
+
+    if (leftValue > lLeftValue_min && leftValue < lLeftValue_max)
+    {
+      overTakeState = LEFT_LINE;
+    }
+    else if (rightValue > lRightValue_min && rightValue < lRightValue_max)
+    {
+      overTakeState = RIGHT_LINE;
     }
 
     else
     {
-      state = STOP;
+      overTakeState = STOP;
     }
     break;
 
 
   default:
-    std::cout << "OverTakeDetMachine screw up" << std::endl;
+    std::cout << "OverTakeDetMachineToLeftExtreme screw up" << std::endl;
     break;
   }
 
-  */
 
 }
 
@@ -1168,6 +1240,17 @@ std::tuple<int, double, bool> OverTakeDetMachine::operationToLeftLane(double m, 
   return std::make_tuple(publishDistance(), publishPixel(), publishNoDetect());
 }
 
+
+std::tuple<int, double, bool> OverTakeDetMachine::operationToLeftLaneExtreme(double m, double r, double l)
+{
+  setLineValue(m, r, l);
+  chooseLineToLeftExtreme();
+
+  return std::make_tuple(publishDistance(), publishPixel(), publishNoDetect());
+}
+
+
+
 std::tuple<int, double, bool> OverTakeDetMachine::operationToRightLane(double m, double r, double l)
 {
   setLineValue(m, r, l);
@@ -1179,9 +1262,9 @@ std::tuple<int, double, bool> OverTakeDetMachine::operationToRightLane(double m,
 std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double r, double l)
 {
 
-  if (coneReactionTimer <= 300)
+  if (coneReactionTimer <= 220)
   {
-    std::tuple<int, double, bool> temp = operationToRightLane(m, r, l);
+    std::tuple<int, double, bool> temp = operationToLeftLane(m, r, l);
     if ((std::get<2>(temp)) == false)
     {
       coneReactionTimer++;
@@ -1190,7 +1273,18 @@ std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double 
     return temp;
   }
 
-  else if (coneReactionTimer > 300 && coneReactionTimer < 600)
+  else if (coneReactionTimer >= 220 && coneReactionTimer < 300)
+  {
+    std::tuple<int, double, bool> temp = operationToLeftLaneExtreme(m, r, l);
+    if ((std::get<2>(temp)) == false)
+    {
+      coneReactionTimer++;
+    }
+
+    return temp;
+  }
+
+  else if (coneReactionTimer >= 300 && coneReactionTimer < 650)
   {
     std::tuple<int, double, bool> temp = operationToRightLane(m, r, l);
     if ((std::get<2>(temp)) == false)

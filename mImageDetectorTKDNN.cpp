@@ -160,7 +160,7 @@ void mImageDetectorTKDNN::Update()
           break;
         case 1:
           right_of_waySize = std::max(double(d.w * d.h), right_of_waySize);
-          if (right_of_waySize > 1200)
+          if (right_of_waySize > 390)
           {
             right_of_wayDetect = true;
           }
@@ -176,7 +176,7 @@ void mImageDetectorTKDNN::Update()
         case 3:
           conesSize = std::max(double(d.w * d.h), conesSize);
           conesX = ((d.x + 0.5 * d.w) - 334.0) / 334.0;
-          if (conesSize > 2300 && std::abs(conesX) < 0.17)
+          if (conesSize > 710 && std::abs(conesX) < 0.17)
           {
             conesDetect = true;
           }
@@ -201,7 +201,7 @@ void mImageDetectorTKDNN::Update()
 
       img_out.SetTimestamp(in_img.GetTimestamp());
 
-      this->out_image.Publish(img_out);
+      //this->out_image.Publish(img_out);
 
       this-> stop.Publish(stopDetect);
       this-> give_way.Publish(give_wayDetect);

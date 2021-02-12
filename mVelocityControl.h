@@ -113,7 +113,7 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  double minVelocity = 0.3;
+  double minVelocity = 0.5;
   double maxVelocity = 0.8;
 
   bool noLineDet;
