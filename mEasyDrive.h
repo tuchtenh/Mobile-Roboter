@@ -201,7 +201,9 @@ private:
 
 
 public:
+  bool switchLeftProcessOn = false;
   bool takeoverProcessOn = false;
+
   void chooseLineToLeft();
   void chooseLineToLeftExtreme();
 
@@ -262,6 +264,15 @@ public:
   tInput<bool> yellowSignDetect;
 
 
+  tOutput<bool> gui_Easy;
+  tOutput<bool> gui_Intersect;
+  tOutput<bool> gui_Cone;
+  tOutput<bool> gui_LeftLane;
+
+  bool easyProcessOn = false;
+
+
+
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -283,6 +294,8 @@ public:
 
   void expAlgrithm(int distance, double pixelValue);
   void expStrongCurv(int distance, double pixelValue);
+
+
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -329,6 +342,12 @@ private:
 
   char straightOrLeft_int_temp;
   bool slowMotion_bool_temp;
+
+  bool gui_Easy_temp = false;
+  bool gui_LeftLane_temp = false;
+  bool gui_Intersect_temp = false;
+  bool gui_Cone_temp = false;
+
 
 
 

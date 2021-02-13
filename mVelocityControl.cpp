@@ -129,9 +129,9 @@ void mVelocityControl::Update()
   {
     out_velocity.Publish(reactToStopSign(stopDet));
   }
-  else if (rightOfWayEnable.Get() || rightOfWayOn)
+  else if (giveWayEnable.Get() || giveWayOn)
   {
-    out_velocity.Publish(reactToRightOfWaySign());
+    out_velocity.Publish(reactToGiveWaySign());
   }
   else
   {
@@ -253,7 +253,7 @@ double mVelocityControl::reactToStopSign(bool detectStop)
   return v;
 }
 
-double mVelocityControl::reactToRightOfWaySign()
+double mVelocityControl::reactToGiveWaySign()
 {
   double v = 0;
   switch (ROWState)
@@ -262,8 +262,8 @@ double mVelocityControl::reactToRightOfWaySign()
     v = maxVelocity;
     ac = 0;
     ic = 0;
-    rightOfWayOn = true;
-    std::cout << "Right of Way sign APPROACH On" << std::endl;
+    giveWayOn = true;
+    std::cout << "Give Way sign APPROACH On" << std::endl;
 
     ROWState = APPROACH;
 
@@ -283,7 +283,7 @@ double mVelocityControl::reactToRightOfWaySign()
     }
     else
     {
-      std::cout << "Right of Way sign APPROACH state bug" << std::endl;
+      std::cout << "Give Way sign APPROACH state bug" << std::endl;
     }
     break;
 
@@ -298,18 +298,18 @@ double mVelocityControl::reactToRightOfWaySign()
     else if (ic > icValue)
     {
       ROWState = START;
-      rightOfWayOn = false;
+      giveWayOn = false;
       turn = false;
-      std::cout << "Right of Way sign APPROACH Off" << std::endl;
+      std::cout << "Give Way sign APPROACH Off" << std::endl;
     }
     else
     {
-      std::cout << "Right of Way sign CONTINUE state bug" << std::endl;
+      std::cout << "Give Way sign CONTINUE state bug" << std::endl;
     }
     break;
 
   default:
-    std::cout << "Right of Way sign reaction wrong" << std::endl;
+    std::cout << "Give Way sign reaction wrong" << std::endl;
     break;
 
   }

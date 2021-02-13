@@ -184,7 +184,7 @@ void mImageDetectorTKDNN::Update()
         case 4://unimog
           unimogSize = std::max(double(d.w * d.h), unimogSize);
           unimogX = ((d.x + 0.5 * d.w) - 334.0) / 334.0;
-          if (unimogSize > 9000 && std::abs(unimogX) < 0.17)
+          if (unimogSize > 8000 && std::abs(unimogX) < 0.18)
           {
             unimogDetect = true;
           }

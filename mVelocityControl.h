@@ -85,7 +85,7 @@ public:
   tInput<bool> conesDetEnable;
   tInput<bool> stop_5_secondEnable;
   tInput<bool> unimogDet;
-  tInput<bool> rightOfWayEnable;
+  tInput<bool> giveWayEnable;
   tInput<double> frontSensor;
   tInput<bool> slowMode;
 
@@ -122,7 +122,7 @@ private:
   bool stopDet;
   bool stopProcessOn = false;
 
-  bool rightOfWayOn = false;
+  bool giveWayOn = false;
   bool turn = false;
 
   bool bridgeProcessOn = false;
@@ -134,8 +134,8 @@ private:
   const int scValue = 50;
   const int dcValue = 30;
 
-  enum RightOfWaySignState {START, APPROACH, CONTINUE};
-  RightOfWaySignState ROWState = START;
+  enum GiveWaySignState {START, APPROACH, CONTINUE};
+  GiveWaySignState ROWState = START;
   int ac = 0; //approach Counter
   int ic = 0; //ignore Counter to ignore the Sign;
   const int acValue = 250;
@@ -149,7 +149,7 @@ private:
   const int descValue = 200;
 
   double reactToStopSign(bool detectStop);
-  double reactToRightOfWaySign();
+  double reactToGiveWaySign();
   double reactToBridge();
 
 

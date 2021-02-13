@@ -124,6 +124,7 @@ void mEasyDrive::Update()
   {
   case EASY:
 
+    easyProcessOn = true;
     lineData = lineDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
 
     distance = std::get<0>(lineData);
@@ -192,11 +193,18 @@ void mEasyDrive::Update()
   case SWITCH_TO_LEFT_MANUAL:
 
     changeSmoothCounter++;
+    overTakeDetPtr->switchLeftProcessOn = true;
 
-    if (changeSmoothCounter < 500)
+    if (changeSmoothCounter < 200)
     {
       slowMotion_bool_temp = true;
       lineData = overTakeDetPtr->operationToLeftLane(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+
+      distance = std::get<0>(lineData);
+      pixel = std::get<1>(lineData);
+      noDetect = std::get<2>(lineData);
+
+      expAlgrithm(distance, pixel);
 
     }
 
@@ -204,21 +212,27 @@ void mEasyDrive::Update()
     {
       lineData = overTakeDetPtr->operationToLeftLaneExtreme(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
       changeSmoothCounter = 1000;
+
+      distance = std::get<0>(lineData);
+      pixel = std::get<1>(lineData);
+      noDetect = std::get<2>(lineData);
+
+      expStrongCurv(distance, pixel);
     }
 
 
-    distance = std::get<0>(lineData);
-    pixel = std::get<1>(lineData);
-    noDetect = std::get<2>(lineData);
 
-    //expSwitchLane(distance, pixel);
-    expAlgrithm(distance, pixel);
+
+
+
 
     if (switchToRight.Get() || coneDetect.Get())
     {
       changeSmoothCounter = 0;
       reactionState = EASY;
       std::cout << "Switch_To_Right" << std::endl;
+
+      overTakeDetPtr->switchLeftProcessOn = false;
     }
 
 
@@ -398,11 +412,23 @@ void mEasyDrive::Update()
   this->out_noLineDetection.Publish(noDetect);
 
 
+  gui_Easy_temp = easyProcessOn;
+  gui_Intersect_temp = intersectDetPtr->interProcessOn;
+  gui_Cone_temp = overTakeDetPtr->takeoverProcessOn;
+  gui_LeftLane_temp = overTakeDetPtr->switchLeftProcessOn;
+
+  this->gui_Easy.Publish(gui_Easy_temp);
+  this->gui_Intersect.Publish(gui_Intersect_temp);
+  this->gui_Cone.Publish(gui_Cone_temp);
+  this->gui_LeftLane.Publish(gui_LeftLane_temp);
+
+
 }
 
 void mEasyDrive::intitialization()
 {
   slowMotion_bool_temp = false;
+  easyProcessOn = false;
 }
 
 void mEasyDrive::getDetectionAndManual()
@@ -481,11 +507,11 @@ void mEasyDrive::expStrongCurv(int distance, double pixelValue)
     function = 3 * (1 - exp(a * x));
   }
 
-  if (function >= 1.5)
+  if (function >= 1.3)
   {
     function = 3;
   }
-  else if (function <= -1.5)
+  else if (function <= -1.3)
   {
     function = -3;
   }
@@ -1273,7 +1299,7 @@ std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double 
     return temp;
   }
 
-  else if (coneReactionTimer >= 220 && coneReactionTimer < 300)
+  else if (coneReactionTimer >= 220 && coneReactionTimer < 280)
   {
     std::tuple<int, double, bool> temp = operationToLeftLaneExtreme(m, r, l);
     if ((std::get<2>(temp)) == false)
@@ -1284,7 +1310,7 @@ std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double 
     return temp;
   }
 
-  else if (coneReactionTimer >= 300 && coneReactionTimer < 650)
+  else if (coneReactionTimer >= 300 && coneReactionTimer < 280)
   {
     std::tuple<int, double, bool> temp = operationToRightLane(m, r, l);
     if ((std::get<2>(temp)) == false)

@@ -90,9 +90,14 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
 
   /*
     mImageDetectorTKDNN*  imageDetector = new mImageDetectorTKDNN(this);
-    imageDetector->stop.ConnectTo(velocity_control->stopEnable);
+
     imageDetector->cones.ConnectTo(easy_drive->coneDetect);
      imageDetector->right_of_way.ConnectTo(easy_drive->yellowSignDetect);
+
+     imageDetector->stop.ConnectTo(velocity_control->stopEnable);
+     imageDetector->unimog.ConnectTo(velocity_control->unimogDet);
+     imageDetector->give_way.ConnectTo(velocity_control->giveWayEnable);
+
   */
 
 
@@ -108,8 +113,9 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   zed_detection->distance_to_right_out.ConnectTo(easy_drive->input_curvature_right);
   zed_detection->distance_to_left_out.ConnectTo(easy_drive->input_curvature_left);
   //this->hardware->so_cam_images.ConnectTo(zed_detection->camera_in);
-  //this->co_velocity.ConnectTo(easy_drive->out_velocity);
-  //this->co_curvature.ConnectTo(easy_drive->out_curvature);
+
+  this->co_velocity.ConnectTo(velocity_control->out_velocity);
+  this->co_curvature.ConnectTo(easy_drive->out_curvature);
 
   //zed_detection->block_move.ConnectTo(easy_drive->block_move_easyDrive);
 
