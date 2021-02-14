@@ -110,6 +110,10 @@ void mVelocityControl::OnParameterChange()
 //----------------------------------------------------------------------
 void mVelocityControl::Update()
 {
+  // initialization
+  //turn = false;
+
+
   if (in_velocity.HasChanged())
   {
     maxVelocity = in_velocity.Get();
@@ -270,7 +274,7 @@ double mVelocityControl::reactToGiveWaySign()
     break;
 
   case APPROACH:
-    v = maxVelocity - ((maxVelocity - minVelocity) * ac * 0.004);
+    v = maxVelocity - ((maxVelocity - minVelocity) * ac * 0.007);
     ac++;
 
     if (ac <= acValue)

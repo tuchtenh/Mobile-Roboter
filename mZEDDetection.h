@@ -88,8 +88,12 @@ public:
   tOutput<double> angle_to_left_out;
   tOutput<double> angle_to_mid_out;
   tOutput<double> angle_to_right_out;
-  
-  tInput<bool> InvertedImage;
+
+  tInput<bool> blueOrRed;
+  tInput<bool> colorSwitchEnable;
+  tInput<bool> colorSwitchFromEasy;
+
+  tOutput<bool> gui_colorSwitch;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -140,14 +144,17 @@ private:
 
   double gray_treshold = 170;
 
-  double M = -70;
-  double m = 0.95;
+  //double M = -70;
+  //double m = 0.95;
   double a = 0;
   double old_right;
   double old_mid;
   double old_left;
   double contrast = 1;
   bool contrast_change = true;
+
+  enum ColorState {BLUE = 0, RED};
+  ColorState colorState = BLUE;
 
 };
 

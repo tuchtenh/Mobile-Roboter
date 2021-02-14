@@ -79,14 +79,16 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   //create module
   //new mEasyDrive(this);
   mEasyDrive* easy_drive = new mEasyDrive(this);
-
-
   mZEDDetection* zed_detection = new mZEDDetection(this);
-  //new mZEDDetection(this);
-
   mVelocityControl* velocity_control = new mVelocityControl(this);
+
+
   easy_drive->out_slowMtion.ConnectTo(velocity_control->slowMode);
   easy_drive->out_noLineDetection.ConnectTo(velocity_control->noLineDetEnable);
+  easy_drive->out_colorSwitch.ConnectTo(zed_detection->colorSwitchFromEasy);
+
+  velocity_control->out_turn.ConnectTo(easy_drive->giveWayDetect);
+
 
   /*
     mImageDetectorTKDNN*  imageDetector = new mImageDetectorTKDNN(this);

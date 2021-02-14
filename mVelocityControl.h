@@ -139,7 +139,8 @@ private:
   int ac = 0; //approach Counter
   int ic = 0; //ignore Counter to ignore the Sign;
   const int acValue = 250;
-  const int icValue = 200;
+  //const int icValue = 200;
+  const int icValue = 1;
 
   enum BridgeState {UP, DOWN};
   BridgeState bridgeState = UP;

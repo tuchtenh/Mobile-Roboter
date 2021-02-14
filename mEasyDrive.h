@@ -183,7 +183,7 @@ private:
 
 
   const double lRightValue_min = 70, lRightValue_max = 490;
-  const double lLeftValue_min = -420, lLeftValue_max = -9;
+  const double lLeftValue_min = -420, lLeftValue_max = 5;
 
 
 
@@ -202,7 +202,7 @@ private:
 
 public:
   bool switchLeftProcessOn = false;
-  bool takeoverProcessOn = false;
+  bool coneProcessOn = false;
 
   void chooseLineToLeft();
   void chooseLineToLeftExtreme();
@@ -219,6 +219,15 @@ public:
   std::tuple<int, double, bool> coneReaction(double m, double r, double l);
   int passConeTimer = 0;
   int coneReactionTimer = 0;
+
+  int coneAtLeftLaneTimer = 0;
+  bool coneDetectAtLeftLane = false;
+
+  int smoothToRightTimer = 0;
+
+  bool switchToRight_temp = 0;
+  bool giveWayDetect_temp = 0;
+
 };
 
 
@@ -262,6 +271,7 @@ public:
   tInput<int> straightOrLeft;
 
   tInput<bool> yellowSignDetect;
+  tInput<bool> giveWayDetect;
 
 
   tOutput<bool> gui_Easy;
@@ -270,6 +280,8 @@ public:
   tOutput<bool> gui_LeftLane;
 
   bool easyProcessOn = false;
+
+  tOutput<bool> out_colorSwitch;
 
 
 
@@ -321,6 +333,9 @@ private:
 
   double curvature;
   std::vector<bool> lights;
+
+  bool colorSwitch = false;
+  bool giveWay_temp = false;
 
 
   virtual void OnStaticParameterChange() override;
