@@ -90,6 +90,8 @@ public:
   tControllerOutput<data_ports::tEvent> co_request_emergency_stop_event;
   std::vector<tControllerInput<bool>> co_lights;
 
+
+
   tSensorInput<double> si_joystick_velocity_normalized;
   tSensorInput<rrlib::si_units::tVelocity<double>> si_joystick_velocity;
   tSensorInput<double> si_joystick_curvature_normalized;

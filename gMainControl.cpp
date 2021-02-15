@@ -89,7 +89,9 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
   easy_drive->out_colorSwitch.ConnectTo(zed_detection->colorSwitchFromEasy);
 
 
+
   velocity_control->out_turn.ConnectTo(easy_drive->giveWayDetect);
+  //velocity_control->out_velController.ConnectTo();
 
 
   /*
@@ -120,6 +122,8 @@ gMainControl::gMainControl(finroc::core::tFrameworkElement *parent, const std::s
 
   this->co_velocity.ConnectTo(velocity_control->out_velocity);
   this->co_curvature.ConnectTo(easy_drive->out_curvature);
+
+  //this->co_lights.ConnectTo(easy_drive->lights_out);
 
   //zed_detection->block_move.ConnectTo(easy_drive->block_move_easyDrive);
 

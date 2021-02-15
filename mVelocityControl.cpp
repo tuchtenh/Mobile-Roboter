@@ -113,7 +113,7 @@ void mVelocityControl::Update()
   // initialization
   //turn = false;
 
-
+  v_controller_temp = false;
   if (in_velocity.HasChanged())
   {
     maxVelocity = in_velocity.Get();
@@ -148,6 +148,7 @@ void mVelocityControl::Update()
     {
       out_velocity.Publish(0.02);
       //velocityController On
+      v_controller_temp = true;
     }
     else
     {
@@ -155,6 +156,7 @@ void mVelocityControl::Update()
     }
   }
   out_turn.Publish(turn);
+  out_velController.Publish(v_controller_temp);
 }
 
 //out_velocity.Publish(reactToStopSign(stop));

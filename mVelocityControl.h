@@ -93,6 +93,8 @@ public:
   tInput<double> in_velocity;
   tOutput<double> out_velocity;
   tOutput<bool> out_turn;
+  tOutput<bool> out_velController;
+
 
 
 
@@ -153,6 +155,8 @@ private:
   double reactToStopSign(bool detectStop);
   double reactToGiveWaySign();
   double reactToBridge();
+
+  bool v_controller_temp = false;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////

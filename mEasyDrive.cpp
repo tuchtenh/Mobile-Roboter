@@ -172,7 +172,6 @@ void mEasyDrive::Update()
     else if (singleLaneDetect.Get())
     {
       reactionState = SINGLE;
-      singleDetPtr->singleProcessOn = true;
       std::cout << "Single Lane Start" << std::endl;
     }
 
@@ -194,6 +193,7 @@ void mEasyDrive::Update()
     expAlgrithm(distance, pixel);
 
     slowMotion_bool_temp = true;
+    leftLight_temp = blinkFunction();
 
     if (overTakeDetPtr->coneProcessOn == false)
     {
@@ -234,6 +234,8 @@ void mEasyDrive::Update()
 
       expAlgrithm(distance, pixel);
 
+      leftLight_temp = blinkFunction();
+
     }
 
     else
@@ -264,6 +266,9 @@ void mEasyDrive::Update()
         noDetect = std::get<2>(lineData);
         expStrongCurv(distance, pixel);
         overTakeDetPtr->smoothToRightTimer++;
+
+        leftLight_temp = false;
+        rightLight_temp = blinkFunction();
       }
       else
       {
@@ -292,6 +297,9 @@ void mEasyDrive::Update()
         noDetect = std::get<2>(lineData);
         expStrongCurv(distance, pixel);
         overTakeDetPtr->coneAtLeftLaneTimer++;
+
+        leftLight_temp = false;
+        rightLight_temp = blinkFunction();
       }
       else
       {
@@ -304,7 +312,23 @@ void mEasyDrive::Update()
     }
     //deal with cone at left lane
 
+    /*
+     else if (yellowSignDetect.Get() == true)
+     {
 
+
+
+
+
+     }
+
+
+
+
+
+
+
+    */
 
 
 
@@ -321,11 +345,21 @@ void mEasyDrive::Update()
     noDetect = std::get<2>(lineData);
 
     expStrongCurv(distance, pixel);
+    leftLight_temp = blinkFunction();
 
     if (intersectDetPtr->interProcessOn == false)
     {
       reactionState = EASY;
       std::cout << "Intersection_Auto_Off" << std::endl;
+
+      if (intersectDetPtr->goSingleLane == true)
+      {
+        reactionState = SINGLE;
+      }
+      else
+      {
+        reactionState = EASY;
+      }
 
     }
 
@@ -343,6 +377,7 @@ void mEasyDrive::Update()
     noDetect = std::get<2>(lineData);
 
     expStrongCurv(distance, pixel);
+    leftLight_temp = blinkFunction();
 
     if (intersectDetPtr->interProcessOn == false)
     {
@@ -367,7 +402,8 @@ void mEasyDrive::Update()
 
     if (intersectDetPtr->interProcessOn == false)
     {
-      reactionState = EASY;
+      //reactionState = EASY;
+      reactionState = SINGLE;
       std::cout << "Intersection_Manual_Straight_Off" << std::endl;
     }
 
@@ -375,7 +411,10 @@ void mEasyDrive::Update()
 
   case SINGLE:
 
+    singleDetPtr->laneWidth = input_curvature_right.Get() - input_curvature_left.Get();
+
     singleMotion_bool_temp = true;
+    singleDetPtr->singleProcessOn = true;
 
     lineData = singleDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
     distance = std::get<0>(lineData);
@@ -386,12 +425,21 @@ void mEasyDrive::Update()
 
     if (easy.Get())
     {
+      intersectDetPtr->goSingleLane = false;
       reactionState = EASY;
       singleDetPtr->singleProcessOn = false;
       std::cout << "Back To Easy" << std::endl;
     }
 
 
+    else if ((singleLaneDetect.Get() == false) && (singleDetPtr->laneWidth >= singleDetPtr->doubleLaneWidth_min) && (singleDetPtr->laneWidth <= singleDetPtr->doubleLaneWidth_max))
+    {
+
+      intersectDetPtr->goSingleLane = false;
+      reactionState = EASY;
+      singleDetPtr->singleProcessOn = false;
+      std::cout << "EasyDrive" << std::endl;
+    }
 
   default:
     break;
@@ -400,16 +448,13 @@ void mEasyDrive::Update()
 
 
 
-  /*********Single Lane Test*****************************************/
-
-  /*********Single Lane Test*****************************************/
-
-
 
   if (noDetect == true) //three lines detection fail
   {
     curvature = 0;
     std::cout << "Line distance is infinite =) =)" << std::endl;
+
+    stopLight_temp = true;
   }
 
   else
@@ -438,6 +483,13 @@ void mEasyDrive::Update()
   //to ZED
   this->out_colorSwitch.Publish(colorSwitch);
 
+  //publish light
+  lights_out_temp[1] = stopLight_temp;
+  lights_out_temp[2] = leftLight_temp;
+  lights_out_temp[3] = rightLight_temp;
+
+  lights_out.Publish(lights_out_temp);
+
 
   gui_Easy_temp = easyProcessOn;
   gui_Intersect_temp = intersectDetPtr->interProcessOn;
@@ -460,6 +512,7 @@ void mEasyDrive::intitialization()
   slowMotion_bool_temp = false;
   singleMotion_bool_temp = false;
   easyProcessOn = false;
+  stopLight_temp = false;
 }
 
 void mEasyDrive::getDetectionAndManual()
@@ -552,57 +605,10 @@ void mEasyDrive::expStrongCurv(int distance, double pixelValue)
 
 void mEasyDrive::ruleBaseAlgrithm()
 {
-  /*if (x > right_boundary_1)
-     {
-     curvature = 1.5;
-     }
-     else if (x > right_boundary_2)
-     {
-     curvature = 1.3;
-     }
-     else if (x > right_boundary_3)
-     {
-     curvature = 1.0;
-     }
-     else if (x > right_boundary_4)
-     {
-     curvature = 0.7;
-     }
-     else if (x > right_boundary_5)
-     {
-     curvature = 0.4;
-     }
-     else if (x < -right_boundary_1)
-     {
-     curvature = -1.5;
-     }
-     else if (x < -right_boundary_2)
-     {
-     curvature = -1.3;
-     }
-     else if (x < -right_boundary_3)
-     {
-     curvature = -1.0;
-     }
-     else if (x < -right_boundary_4)
-     {
-     curvature = -0.7;
-     }
-     else if (x < -right_boundary_5)
-     {
-     curvature = -0.4;
-     }
-     else
-     {
-     curvature = 0;
-     }*/
 }
 
 void mEasyDrive::linearAlgrithm()
 {
-
-
-
 }
 
 void mEasyDrive::powerAlgrithm(int distance, double pixelValue)
@@ -621,6 +627,26 @@ void mEasyDrive::powerAlgrithm(int distance, double pixelValue)
   }*/
 
   curvature = function;
+
+}
+
+bool mEasyDrive::blinkFunction()
+{
+  blinkTimer_temp++;
+  if (blinkTimer_temp < (blinkTimer / 2))
+  {
+    return true;
+  }
+
+  else if (blinkTimer_temp >= (blinkTimer / 2) && blinkTimer_temp < blinkTimer)
+  {
+    return false;
+  }
+  else
+  {
+    blinkTimer_temp = 0;
+    return false;
+  }
 
 }
 
@@ -929,6 +955,8 @@ void IntersectDetMachine::chooseLine()
       intersectState = MID_LINE;
       rc = 0;
       interProcessOn = false;
+
+      goSingleLane = true;  ///////////////////////////////////////////////////////////
     }
 
     else if (rightValue < rightValue_min || rightValue > rightValue_max)
@@ -1432,7 +1460,6 @@ void SingleDetMachine::chooseLine()
   }
 
 }
-
 
 
 //----------------------------------------------------------------------

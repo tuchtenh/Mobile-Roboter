@@ -131,7 +131,7 @@ class IntersectDetMachine : public LineDetMachine
 public:
 
 
-
+  bool goSingleLane = false;
   bool interProcessOn = false;
   void chooseLine();
 
@@ -230,6 +230,13 @@ public:
   bool singleProcessOn = false;
   void chooseLine();
 
+  double laneWidth = 0;
+
+  const double singleLaneWidth = 310; // for record
+
+  const double doubleLaneWidth_min = 420;
+  const double doubleLaneWidth_max = 700;
+
 
 private:
 
@@ -241,6 +248,8 @@ private:
 
   const double rightValue_min = 113, rightValue_max = 344;
   const double leftValue_min = -341, leftValue_max = 0;
+
+
 
 
 
@@ -278,8 +287,6 @@ public:
   tInput<double> input_curvature_right;
 
 
-  tInput<bool> test_bool;
-
   tInput<bool> easy;
 
   tInput<bool> coneDetect;
@@ -293,7 +300,7 @@ public:
 
   tInput<bool> singleLaneDetect;
 
-
+  tOutput<bool> out_colorSwitch;
 
   tOutput<bool> gui_Easy;
   tOutput<bool> gui_Intersect;
@@ -303,7 +310,11 @@ public:
 
   bool easyProcessOn = false;
 
-  tOutput<bool> out_colorSwitch;
+  //tOutput<bool> stopLight;
+  //tOutput<bool> leftLight;
+  //tOutput<bool> rightLight;
+
+  tOutput<std::vector<bool>> lights_out;
 
 
 
@@ -354,7 +365,6 @@ private:
   double changeSmoothCounter = 0;
 
   double curvature;
-  std::vector<bool> lights;
 
   bool colorSwitch = false;
   bool giveWay_temp = false;
@@ -389,6 +399,18 @@ private:
   bool gui_Intersect_temp = false;
   bool gui_Cone_temp = false;
   bool gui_Single_temp = false;
+
+  int blinkTimer_temp;
+  const int blinkTimer = 5;
+  bool blinkFunction();
+
+  bool stopLight_temp = false;
+  bool leftLight_temp = false;
+  bool rightLight_temp = false;
+
+  std::vector<bool> lights_out_temp = { false, stopLight_temp, leftLight_temp, rightLight_temp };
+
+
 
 
 
