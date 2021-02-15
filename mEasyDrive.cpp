@@ -169,6 +169,13 @@ void mEasyDrive::Update()
       std::cout << "Intersection_Manual_Straight" << std::endl;
     }
 
+    else if (singleLaneDetect.Get())
+    {
+      reactionState = SINGLE;
+      singleDetPtr->singleProcessOn = true;
+      std::cout << "Single Lane Start" << std::endl;
+    }
+
     else
     {
       reactionState = EASY;
@@ -366,10 +373,37 @@ void mEasyDrive::Update()
 
     break;
 
+  case SINGLE:
+
+    singleMotion_bool_temp = true;
+
+    lineData = singleDetPtr->operation(input_curvature_middle.Get(), input_curvature_right.Get(), input_curvature_left.Get());
+    distance = std::get<0>(lineData);
+    pixel = std::get<1>(lineData);
+    noDetect = std::get<2>(lineData);
+
+    expStrongCurv(distance, pixel);
+
+    if (easy.Get())
+    {
+      reactionState = EASY;
+      singleDetPtr->singleProcessOn = false;
+      std::cout << "Back To Easy" << std::endl;
+    }
+
+
+
   default:
     break;
 
   }// switch  reactionState
+
+
+
+  /*********Single Lane Test*****************************************/
+
+  /*********Single Lane Test*****************************************/
+
 
 
   if (noDetect == true) //three lines detection fail
@@ -395,10 +429,13 @@ void mEasyDrive::Update()
     colorSwitch = false;
   }
 
-
-  this->out_slowMtion.Publish(slowMotion_bool_temp);
+  //to velocity controller
+  this->out_slowMotion.Publish(slowMotion_bool_temp);
+  this->out_singleMotion.Publish(singleMotion_bool_temp);
   this->out_curvature.Publish(curvature);
   this->out_noLineDetection.Publish(noDetect);
+
+  //to ZED
   this->out_colorSwitch.Publish(colorSwitch);
 
 
@@ -406,11 +443,13 @@ void mEasyDrive::Update()
   gui_Intersect_temp = intersectDetPtr->interProcessOn;
   gui_Cone_temp = overTakeDetPtr->coneProcessOn;
   gui_LeftLane_temp = overTakeDetPtr->switchLeftProcessOn;
+  gui_Single_temp = singleDetPtr->singleProcessOn;
 
   this->gui_Easy.Publish(gui_Easy_temp);
   this->gui_Intersect.Publish(gui_Intersect_temp);
   this->gui_Cone.Publish(gui_Cone_temp);
   this->gui_LeftLane.Publish(gui_LeftLane_temp);
+  this->gui_Single.Publish(gui_Single_temp);
 
 
 
@@ -419,6 +458,7 @@ void mEasyDrive::Update()
 void mEasyDrive::intitialization()
 {
   slowMotion_bool_temp = false;
+  singleMotion_bool_temp = false;
   easyProcessOn = false;
 }
 
@@ -1191,7 +1231,7 @@ void OverTakeDetMachine::chooseLineToRight()
       noLineDetection = false;
       pixel = rightValue;
       distance = rLane_right_distance;
-      std::cout << "Left Line Choose for OverTakeToRight" << std::endl;
+      std::cout << "Right Line Choose for OverTakeToRight" << std::endl;
     }
 
     else
@@ -1320,6 +1360,76 @@ std::tuple<int, double, bool> OverTakeDetMachine::coneReaction(double m, double 
   }
 
 
+
+}
+
+
+void SingleDetMachine::chooseLine()
+{
+  switch (SingleState)
+  {
+  case RIGHT_LINE:
+    if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      SingleState = RIGHT_LINE;
+      noLineDetection = false;
+      pixel = rightValue;
+      distance = single_right_distance;
+      std::cout << "Right Line Choose for SingleLane" << std::endl;
+    }
+
+    else
+    {
+      SingleState = LEFT_LINE;
+    }
+    break;
+
+  case LEFT_LINE:
+    if (leftValue > leftValue_min && leftValue < leftValue_max)
+    {
+      SingleState = LEFT_LINE;
+      noLineDetection = false;
+      pixel = leftValue;
+      distance = single_left_distance;
+      std::cout << "Left Line Choose for SingleLane" << std::endl;
+    }
+    else if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      SingleState = RIGHT_LINE;
+    }
+    else
+    {
+      SingleState = STOP;
+    }
+    break;
+
+  case STOP:
+    distance = 0;
+    pixel = 0;
+    noLineDetection = true;
+
+    std::cout << "Single Lane stop" << std::endl;
+
+    if (rightValue > rightValue_min && rightValue < rightValue_max)
+    {
+      SingleState = RIGHT_LINE;
+    }
+    else if (leftValue > leftValue_min && leftValue < leftValue_max)
+    {
+      SingleState = LEFT_LINE;
+    }
+
+    else
+    {
+      SingleState = STOP;
+    }
+    break;
+
+
+  default:
+    std::cout << "Sinle Lane Machine screw up screw up" << std::endl;
+    break;
+  }
 
 }
 

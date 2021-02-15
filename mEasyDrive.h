@@ -124,9 +124,6 @@ public:
   std::tuple<int, double, bool> operation(double m, double r, double l);
 
 
-
-
-
 };
 
 class IntersectDetMachine : public LineDetMachine
@@ -150,11 +147,6 @@ private:
   int mc = 0;
   int rc = 0;
   const int interCounter = 350;
-
-
-
-
-
 
 };
 
@@ -231,6 +223,30 @@ public:
 };
 
 
+class SingleDetMachine : public LineDetMachine
+{
+public:
+
+  bool singleProcessOn = false;
+  void chooseLine();
+
+
+private:
+
+  enum SingleState { RIGHT_LINE = 0, LEFT_LINE, STOP };
+  SingleState SingleState = RIGHT_LINE;
+
+  const double single_right_distance = -237;
+  const double single_left_distance = 123;
+
+  const double rightValue_min = 113, rightValue_max = 344;
+  const double leftValue_min = -341, leftValue_max = 0;
+
+
+
+};
+
+
 
 
 
@@ -253,7 +269,8 @@ public:
 
   tOutput<double> out_curvature;
   tOutput<bool> out_noLineDetection;
-  tOutput<bool> out_slowMtion;
+  tOutput<bool> out_slowMotion;
+  tOutput<bool> out_singleMotion;
 
 
   tInput<double> input_curvature_left;
@@ -263,6 +280,7 @@ public:
 
   tInput<bool> test_bool;
 
+  tInput<bool> easy;
 
   tInput<bool> coneDetect;
   tInput<bool> switchToLeft;
@@ -273,11 +291,15 @@ public:
   tInput<bool> yellowSignDetect;
   tInput<bool> giveWayDetect;
 
+  tInput<bool> singleLaneDetect;
+
+
 
   tOutput<bool> gui_Easy;
   tOutput<bool> gui_Intersect;
   tOutput<bool> gui_Cone;
   tOutput<bool> gui_LeftLane;
+  tOutput<bool> gui_Single;
 
   bool easyProcessOn = false;
 
@@ -326,7 +348,7 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  enum ReactionState {EASY = 0, CONE, SWITCH_TO_LEFT_MANUAL, TURN_LEFT_GO_STRAIGHT_AUTO, TURN_LEFT_GO_STRAIGHT_MANUAL_LEFT, TURN_LEFT_GO_STRAIGHT_MANUAL_STRAIGHT};
+  enum ReactionState {EASY = 0, CONE, SWITCH_TO_LEFT_MANUAL, TURN_LEFT_GO_STRAIGHT_AUTO, TURN_LEFT_GO_STRAIGHT_MANUAL_LEFT, TURN_LEFT_GO_STRAIGHT_MANUAL_STRAIGHT, SINGLE};
   ReactionState reactionState = EASY;
 
   double changeSmoothCounter = 0;
@@ -354,14 +376,19 @@ private:
   OverTakeDetMachine overTakeDet;
   OverTakeDetMachine* overTakeDetPtr = &overTakeDet;
 
+  SingleDetMachine singleDet;
+  SingleDetMachine* singleDetPtr = &singleDet;
+
 
   char straightOrLeft_int_temp;
   bool slowMotion_bool_temp;
+  bool singleMotion_bool_temp;
 
   bool gui_Easy_temp = false;
   bool gui_LeftLane_temp = false;
   bool gui_Intersect_temp = false;
   bool gui_Cone_temp = false;
+  bool gui_Single_temp = false;
 
 
 

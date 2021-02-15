@@ -88,6 +88,7 @@ public:
   tInput<bool> giveWayEnable;
   tInput<double> frontSensor;
   tInput<bool> slowMode;
+  tInput<bool> singleMode;
 
   tInput<double> in_velocity;
   tOutput<double> out_velocity;

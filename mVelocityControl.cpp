@@ -143,6 +143,12 @@ void mVelocityControl::Update()
     {
       out_velocity.Publish(minVelocity);
     }
+
+    else if (singleMode.Get())
+    {
+      out_velocity.Publish(0.02);
+      //velocityController On
+    }
     else
     {
       out_velocity.Publish(maxVelocity);
@@ -274,7 +280,7 @@ double mVelocityControl::reactToGiveWaySign()
     break;
 
   case APPROACH:
-    v = maxVelocity - ((maxVelocity - minVelocity) * ac * 0.007);
+    v = maxVelocity - ((maxVelocity - minVelocity) * ac * 0.004);
     ac++;
 
     if (ac <= acValue)
