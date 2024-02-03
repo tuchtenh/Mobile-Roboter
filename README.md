@@ -1,4 +1,4 @@
-# RC Unimog Bachelor Project WS2020/2021
+# RC Unimog Project WS2020/2021
 
 "The RC Unimog is a platform based on a popular RC-car. Instead of using an RC-receiver, a Raspberry Pi 3 controls the steering servo and the cruise control. The Raspberry-Pi-Camera and an Asus Xtion capture 2D and 3D images. Using AD-converters, a PWM-board, and the Raspberry-Pi-IO-Pins, the infrared sensors to the left and the right of the vehicle and ultrasonic sensors to the front and the rear are connected. Custom made wheel speed sensors have been added to the wheels.
 
